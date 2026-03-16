@@ -219,7 +219,7 @@ export default function UserProfilePage() {
                   const cover = pb.photos?.[0]?.image_url;
                   const count = pb.photos?.length || 0;
                   return (
-                    <div key={pb.id} style={{ display: 'flex', flexDirection: 'column', group: 'true' }}>
+                    <div key={pb.id} style={{ display: 'flex', flexDirection: 'column' }}>
                       <div 
                         onClick={() => router.push(`/photobook/${pb.id}`)} 
                         style={{ cursor: 'pointer', aspectRatio: '4/3', backgroundColor: 'var(--line-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative', border: '1px solid var(--line-color)' }}
