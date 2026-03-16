@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&display=swap');
+
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --muted: #666666;
+  --border: #000000; /* Bordas agora são pretas para dar estrutura */
+  --line-light: #eeeeee;
+  --accent: #000000;
+}
+
+[data-theme="dark"] {
+  --bg: #000000;
+  --text: #ffffff;
+  --muted: #aaaaaa;
+  --border: #ffffff;
+  --line-light: #222222;
+  --accent: #ffffff;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ESTRUTURA BRUTALISTA (BORDAS PRETAS) */
+.card-border {
+  border: 1px solid var(--border);
+}
+
+button {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.1s ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--bg);
+}
+
+/* INPUTS COM FUNDO SUTIL PARA NÃO "SUMIREM" */
+input, textarea {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  outline: none;
+  border-radius: 0;
+}
+
+input:focus {
+  box-shadow: 2px 2px 0px var(--border);
+}
+
+.meta {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.parent-hover:hover .show-on-hover {
+  opacity: 1;
+}
+
+.show-on-hover {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
