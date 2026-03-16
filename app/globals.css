@@ -32,12 +32,16 @@ body {
   border: 1px solid var(--border);
 }
 
+.thin-border {
+  border: 1px solid var(--line-light);
+}
+
 button {
   background: transparent;
   border: 1px solid var(--border);
   padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text);
   cursor: pointer;
   border-radius: 0;
@@ -106,4 +110,34 @@ input:focus {
   .hide-on-mobile {
     display: none !important;
   }
+
+  /* BARRA INFERIOR ESTILO APP */
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom); /* Suporte para iPhone "notch" */
+  }
+
+  /* Ajustar o padding do main para não cobrir a barra inferior */
+  main {
+    padding-bottom: 100px !important;
+  }
+
+  .full-width-mobile {
+    width: 100vw !important;
+    margin-left: -15px !important; /* Compensa o padding do main */
+  }
+}
+
+.mobile-bottom-nav {
+  display: none;
 }
