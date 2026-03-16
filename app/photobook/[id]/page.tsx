@@ -182,17 +182,17 @@ export default function PhotobookDetailPage() {
         </header>
 
         {/* TIMELINE DE MOMENTOS (ESCALA HUMANA) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '100px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
           {photoGroups.map((group) => (
-            <article key={group.id} className="parent-hover" style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
+            <article key={group.id} className="parent-hover" style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
               
               {/* GRADE FLEXÍVEL E COMPORTADA */}
               <div style={{ 
                 display: 'grid', 
                 gridTemplateColumns: group.photos.length === 1 ? '1fr' : 'repeat(auto-fit, minmax(140px, 1fr))', 
-                gap: '4px',
+                gap: '2px',
                 width: '100%',
-                maxWidth: group.photos.length === 1 ? '450px' : '100%'
+                maxWidth: group.photos.length === 1 ? '100%' : '100%'
               }}>
                 {group.photos.map((photo) => (
                   <div key={photo.id} className="parent-hover" style={{ border: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>

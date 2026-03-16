@@ -135,23 +135,23 @@ export default function Header() {
       display: 'flex', 
       justifyContent: 'space-between', 
       alignItems: 'center', 
-      padding: '15px 40px', 
+      padding: '12px 20px', 
       borderBottom: '1px solid var(--line-color)', 
       position: 'sticky', 
       top: 0, 
       backgroundColor: 'var(--background-color)', 
       zIndex: 100 
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
-        <h1 onClick={() => router.push('/')} style={{ margin: 0, fontSize: '24px', fontFamily: '"Alfa Slab One", serif', cursor: 'pointer', letterSpacing: '-1.5px' }}>miphobook</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexGrow: 1 }}>
+        <h1 onClick={() => router.push('/')} style={{ margin: 0, fontSize: '20px', fontFamily: '"Alfa Slab One", serif', cursor: 'pointer', letterSpacing: '-1px' }}>miphobook</h1>
         
-        <div ref={searchRef} style={{ position: 'relative', width: '250px' }}>
+        <div ref={searchRef} style={{ position: 'relative', width: '100%', maxWidth: '200px' }}>
           <input
             type="text"
-            placeholder="Buscar usuários..."
+            placeholder="Buscar..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', padding: '8px 12px', backgroundColor: 'transparent', border: '1px solid var(--line-color)', color: 'var(--text-primary-color)', fontSize: '13px', outline: 'none' }}
+            style={{ width: '100%', padding: '6px 10px', backgroundColor: 'transparent', border: '1px solid var(--line-color)', color: 'var(--text-primary-color)', fontSize: '11px', outline: 'none' }}
           />
           {showResults && (
             <div style={{ position: 'absolute', top: '105%', left: 0, right: 0, backgroundColor: 'var(--background-color)', border: '1px solid var(--line-color)', zIndex: 1000, boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
@@ -233,14 +233,14 @@ export default function Header() {
               )}
             </div>
 
-            <button onClick={() => router.push('/create-photobook')} style={buttonStyle}>
+            <button onClick={() => router.push('/create-photobook')} style={{ ...buttonStyle, padding: '8px' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
-              Novo
+              <span className="hide-on-mobile">Novo</span>
             </button>
             
-            <button onClick={() => router.push(`/profile/${userId}`)} style={buttonStyle}>
+            <button onClick={() => router.push(`/profile/${userId}`)} style={{ ...buttonStyle, padding: '8px' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>person</span>
-              Perfil
+              <span className="hide-on-mobile">Perfil</span>
             </button>
 
             <button onClick={() => router.push('/settings')} style={iconButtonStyle}>

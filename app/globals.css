@@ -81,3 +81,29 @@ input:focus {
   opacity: 0;
   transition: opacity 0.15s ease;
 }
+
+/* AJUSTES PARA CELULAR (RESPONSIVIDADE) */
+@media (max-width: 768px) {
+  .show-on-hover {
+    opacity: 1 !important; /* Em telas touch, as ações devem estar visíveis */
+  }
+
+  /* Ajustar containers globais */
+  main {
+    padding: 20px 15px !important;
+  }
+
+  /* Reduzir títulos e textos */
+  h1 { font-size: 20px !important; }
+  h2 { font-size: 18px !important; }
+
+  /* Ajustar botões para toque */
+  button {
+    padding: 10px 15px !important;
+    font-size: 11px !important;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+}

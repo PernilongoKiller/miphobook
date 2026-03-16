@@ -71,15 +71,15 @@ export default function Home() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main style={{ flexGrow: 1, maxWidth: '1000px', margin: '0 auto', width: '100%', padding: '60px 20px' }}>
+      <main style={{ flexGrow: 1, maxWidth: '1000px', margin: '0 auto', width: '100%', padding: '40px 15px' }}>
         
-        <div style={{ display: 'flex', gap: '30px', marginBottom: '60px', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '40px', borderBottom: '1px solid var(--border)' }}>
           <button 
             onClick={() => setActiveTab('explore')} 
             style={{ 
               background: 'none', border: 'none', borderBottom: activeTab === 'explore' ? '2px solid var(--text)' : 'none',
-              padding: '15px 0', fontSize: '11px', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', color: activeTab === 'explore' ? 'var(--text)' : 'var(--muted)',
-              cursor: 'pointer'
+              padding: '12px 0', fontSize: '11px', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', color: activeTab === 'explore' ? 'var(--text)' : 'var(--muted)',
+              cursor: 'pointer', flexGrow: user ? 1 : 0
             }}
           >Explorar</button>
           {user && (
@@ -87,8 +87,8 @@ export default function Home() {
               onClick={() => setActiveTab('following')} 
               style={{ 
                 background: 'none', border: 'none', borderBottom: activeTab === 'following' ? '2px solid var(--text)' : 'none',
-                padding: '15px 0', fontSize: '11px', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', color: activeTab === 'following' ? 'var(--text)' : 'var(--muted)',
-                cursor: 'pointer'
+                padding: '12px 0', fontSize: '11px', fontWeight: '900', letterSpacing: '1px', textTransform: 'uppercase', color: activeTab === 'following' ? 'var(--text)' : 'var(--muted)',
+                cursor: 'pointer', flexGrow: 1
               }}
             >Seguindo</button>
           )}
