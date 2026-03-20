@@ -25,6 +25,32 @@ export default function LoginPage() {
     return `Erro: ${message}`
   }
 
+  const handleGoogleLogin = async () => {
+    setLoading(true)
+    if (!supabase) {
+      toast('Sistema indisponível no momento.', 'error')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        toast(translateError(error.message), 'error')
+        setLoading(false)
+      }
+    } catch (err) {
+      toast('Erro ao conectar com Google.', 'error')
+      setLoading(false)
+    }
+  }
+
   const handleAuth = async (event: React.FormEvent) => {
     event.preventDefault()
     setLoading(true)
@@ -52,20 +78,6 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        const { data: existingProfile } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', data.user.id)
-          .maybeSingle()
-
-        if (!existingProfile) {
-          await supabase.from('users').insert([{
-            id: data.user.id,
-            email: data.user.email,
-            username: data.user.email?.split('@')[0] || `user_${data.user.id.substring(0, 8)}`,
-          }])
-        }
-
         toast('Bem-vindo(a) ao Miphobook!', 'success')
         router.push('/')
       }
@@ -125,6 +137,26 @@ export default function LoginPage() {
             {loading ? 'Processando...' : (isSigningUp ? 'Cadastrar' : 'Entrar')}
           </button>
         </form>
+
+        <div style={{ display: 'flex', alignItems: 'center', margin: '25px 0', gap: '15px' }}>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}></div>
+          <span style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: '900' }}>OU</span>
+          <div style={{ flex: 1, height: '1px', background: 'var(--border)' }}></div>
+        </div>
+
+        <button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          style={{ 
+            width: '100%', background: 'transparent', color: 'var(--text)', border: '1px solid var(--border)', 
+            padding: '12px', fontWeight: '900', fontSize: '11px', letterSpacing: '2px', 
+            textTransform: 'uppercase', cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+          }}
+        >
+          <img src="https://www.google.com/favicon.ico" alt="Google" style={{ width: '16px', height: '16px' }} />
+          Continuar com Google
+        </button>
 
         <p style={{ marginTop: '25px', fontSize: '11px', color: 'var(--muted)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
           {isSigningUp ? 'Já tem conta?' : 'Não tem conta?'}

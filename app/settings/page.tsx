@@ -99,7 +99,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
       <main style={{ flexGrow: 1, maxWidth: '600px', margin: '60px auto', width: '100%', padding: '0 20px' }}>
@@ -107,28 +107,28 @@ export default function SettingsPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
-          <div style={{ padding: '20px', border: '1px solid var(--line-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '20px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '18px' }}>Tema do Sistema</h3>
-              <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: 'var(--text-secondary-color)' }}>Alterne entre modo claro e escuro</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: 'var(--muted)' }}>Alterne entre modo claro e escuro</p>
             </div>
-            <button onClick={toggleTheme} style={{ background: 'none', border: '1px solid var(--text-primary-color)', padding: '10px', display: 'flex', cursor: 'pointer', color: 'var(--text-primary-color)' }}>
+            <button onClick={toggleTheme} style={{ background: 'none', border: '1px solid var(--text)', padding: '10px', display: 'flex', cursor: 'pointer', color: 'var(--text)' }}>
               <span className="material-symbols-outlined">{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
             </button>
           </div>
 
-          <div style={{ padding: '20px', border: '1px solid var(--line-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '20px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '18px' }}>Sair da Conta</h3>
-              <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: 'var(--text-secondary-color)' }}>Encerra sua sessão atual</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: 'var(--muted)' }}>Encerra sua sessão atual</p>
             </div>
-            <button onClick={handleLogout} style={{ background: 'none', border: '1px solid var(--text-primary-color)', padding: '10px 20px', cursor: 'pointer', color: 'var(--text-primary-color)', fontWeight: 'bold' }}>Sair</button>
+            <button onClick={handleLogout} style={{ background: 'none', border: '1px solid var(--text)', padding: '10px 20px', cursor: 'pointer', color: 'var(--text)', fontWeight: 'bold' }}>Sair</button>
           </div>
 
           <div style={{ padding: '20px', border: '1px solid #ff4d4f', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '40px' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: '18px', color: '#ff4d4f' }}>Excluir Conta</h3>
-              <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: 'var(--text-secondary-color)' }}>Ação irreversível. Apaga todos os seus dados.</p>
+              <p style={{ margin: '5px 0 0 0', fontSize: '14px', color: 'var(--muted)' }}>Ação irreversível. Apaga todos os seus dados.</p>
             </div>
             <button onClick={handleDeleteAccount} disabled={loading} style={{ background: '#ff4d4f', border: 'none', padding: '10px 20px', cursor: 'pointer', color: 'white', fontWeight: 'bold', opacity: loading ? 0.6 : 1 }}>
               {loading ? 'Processando...' : 'Excluir'}

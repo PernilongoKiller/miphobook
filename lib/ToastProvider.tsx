@@ -51,11 +51,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             style={{
               padding: '12px 20px',
-              backgroundColor: t.type === 'error' ? '#ff4d4f' : 'var(--text-primary-color)',
-              color: 'var(--background-color)',
+              backgroundColor: t.type === 'error' ? '#ff4d4f' : 'var(--text)',
+              color: 'var(--bg)',
               fontSize: '13px',
               fontWeight: 'bold',
-              border: '1px solid var(--line-color)',
+              border: '1px solid var(--border)',
               boxShadow: '4px 4px 0px rgba(0,0,0,0.1)',
               pointerEvents: 'auto',
               minWidth: '200px',

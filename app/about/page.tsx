@@ -9,7 +9,7 @@ export default function AboutPage() {
   const { user, loading } = useUser()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
       
       <main style={{ flexGrow: 1, maxWidth: '800px', margin: '80px auto', padding: '0 40px' }}>
@@ -17,7 +17,7 @@ export default function AboutPage() {
           Nem toda foto é só uma imagem.
         </h2>
         
-        <div style={{ fontSize: '24px', lineHeight: '1.5', marginBottom: '60px', borderLeft: '6px solid var(--text-primary-color)', paddingLeft: '30px' }}>
+        <div style={{ fontSize: '24px', lineHeight: '1.5', marginBottom: '60px', borderLeft: '6px solid var(--text)', paddingLeft: '30px' }}>
           <p style={{ marginBottom: '20px' }}>
             Algumas guardam um momento. No Miphobook, você cria álbuns públicos com suas fotos e pode escrever sobre cada uma delas — onde foi, o que sentiu, por que aquele dia importou.
           </p>
@@ -27,31 +27,31 @@ export default function AboutPage() {
         </div>
 
         <div style={{ marginBottom: '80px' }}>
-          <p style={{ fontSize: '18px', color: 'var(--text-secondary-color)', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '18px', color: 'var(--muted)', lineHeight: '1.6' }}>
             O Miphobook nasceu da necessidade de um lugar calmo na internet. Onde a pressa do <i>scroll</i> infinito dá lugar à contemplação de um álbum bem montado.
           </p>
         </div>
 
-        <section style={{ borderTop: '1px solid var(--line-color)', paddingTop: '40px' }}>
-          <h3 style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '20px', color: 'var(--text-secondary-color)' }}>
+        <section style={{ borderTop: '1px solid var(--border)', paddingTop: '40px' }}>
+          <h3 style={{ fontSize: '11px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '20px', color: 'var(--muted)' }}>
             A FILOSOFIA
           </h3>
           <p style={{ fontSize: '16px', marginBottom: '15px', fontWeight: '500' }}>
             Não buscamos curtidas rápidas, buscamos memórias duradouras.
           </p>
-          <p style={{ fontSize: '16px', color: 'var(--text-secondary-color)' }}>
+          <p style={{ fontSize: '16px', color: 'var(--muted)' }}>
             Um espaço minimalista projetado para que suas histórias não se percam no barulho digital. Cada photobook é um capítulo, cada foto é um verso.
           </p>
         </section>
 
         {!user && !loading && (
-          <div style={{ marginTop: '100px', padding: '40px', border: '1px solid var(--text-primary-color)', textAlign: 'center', backgroundColor: 'var(--text-primary-color)', color: 'var(--background-color)' }}>
+          <div style={{ marginTop: '100px', padding: '40px', border: '1px solid var(--text)', textAlign: 'center', backgroundColor: 'var(--text)', color: 'var(--bg)' }}>
             <h2 style={{ fontSize: '24px', fontWeight: '900', marginBottom: '20px' }}>FAÇA PARTE DESSA CURADORIA.</h2>
             <button 
               onClick={() => router.push('/login')} 
               style={{ 
-                background: 'var(--background-color)', 
-                color: 'var(--text-primary-color)', 
+                background: 'var(--bg)', 
+                color: 'var(--text)', 
                 padding: '12px 30px', 
                 fontSize: '14px', 
                 fontWeight: '900',

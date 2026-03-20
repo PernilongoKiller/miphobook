@@ -23,19 +23,16 @@ export default function UserProfilePage() {
 
   const fetchData = useCallback(async () => {
     if (!supabase || !id || id === 'null' || id === 'undefined') return
-    
-    await new Promise(resolve => setTimeout(resolve, 100));
     setLoading(true)
     setError(null)
 
     try {
       const authId = currentUser?.id || null
-
       const { data: pData, error: pError } = await supabase.from('users').select('*').eq('id', id).maybeSingle()
+      
       if (pError) throw pError
       if (!pData) {
         setError("Perfil não encontrado.")
-        setLoading(false)
         return
       }
       setProfile(pData)
@@ -56,7 +53,7 @@ export default function UserProfilePage() {
       })
 
     } catch (err: any) {
-      console.error("Erro na busca:", err)
+      console.error("Erro no Perfil:", err)
       setError("Erro ao carregar dados.")
     } finally {
       setLoading(false)
@@ -83,181 +80,141 @@ export default function UserProfilePage() {
 
   const isOwner = !!(currentUser && profile && currentUser.id === profile.id)
 
-  const buttonStyle: React.CSSProperties = {
-    background: 'transparent', border: '1px solid var(--text-primary-color)', padding: '10px 24px',
-    fontSize: '13px', color: 'var(--text-primary-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-    transition: 'all 0.2s', fontWeight: 'bold'
-  }
-
   if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Header />
-      <main style={{ flexGrow: 1, width: '100%' }}>
-        <Skeleton height="320px" width="100%" borderRadius={0} style={{ borderBottom: '1px solid var(--line-color)' }} />
-        
-        <div style={{ maxWidth: '1200px', margin: '-80px auto 0 auto', padding: '0 60px 80px 60px' }}>
-          <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-end', marginBottom: '50px' }}>
-            <Skeleton width="160px" height="140px" borderRadius={0} style={{ flexShrink: 0, border: '4px solid var(--background-color)' }} />
-            <div style={{ flexGrow: 1, paddingBottom: '5px' }}>
-              <Skeleton height="56px" width="300px" style={{ marginBottom: '20px' }} />
-              <div style={{ display: 'flex', gap: '25px' }}>
-                <Skeleton height="20px" width="100px" />
-                <Skeleton height="20px" width="100px" />
-              </div>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', marginBottom: '80px' }}>
-             <div style={{ flex: '2 1 400px' }}>
-                <Skeleton height="20px" width="100%" style={{ marginBottom: '10px' }} />
-                <Skeleton height="20px" width="90%" style={{ marginBottom: '10px' }} />
-                <Skeleton height="20px" width="60%" />
-             </div>
-             <div style={{ flex: '1 1 200px' }}>
-                <Skeleton height="15px" width="100px" style={{ marginBottom: '15px' }} />
-                <Skeleton height="20px" width="150px" style={{ marginBottom: '10px' }} />
-                <Skeleton height="20px" width="150px" />
-             </div>
-          </div>
-
-          <div style={{ borderTop: '1px solid var(--line-color)', paddingTop: '60px' }}>
-            <Skeleton height="28px" width="200px" style={{ marginBottom: '50px' }} />
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '50px' }}>
-               {Array.from({ length: 4 }).map((_, i) => (
-                 <div key={i}>
-                   <Skeleton height="260px" width="100%" style={{ marginBottom: '25px' }} />
-                   <Skeleton height="24px" width="80%" style={{ marginBottom: '10px' }} />
-                   <Skeleton height="15px" width="100%" style={{ marginBottom: '10px' }} />
-                   <Skeleton height="15px" width="40%" />
-                 </div>
-               ))}
-            </div>
-          </div>
+      <main className="main-container">
+        <Skeleton height="200px" width="100%" style={{ marginBottom: '20px' }} />
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
+          <Skeleton width="100px" height="100px" />
+          <Skeleton width="200px" height="40px" />
+        </div>
+        <div className="responsive-grid">
+           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} height="240px" width="100%" />)}
         </div>
       </main>
     </div>
   )
 
-  if (error || !profile) return <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)', padding: '20px', textAlign: 'center' }}>
-    <span className="material-symbols-outlined" style={{ fontSize: '48px', marginBottom: '20px' }}>person_off</span>
-    <p>{error}</p>
-    <button onClick={() => router.push('/')} style={buttonStyle}>Voltar</button>
-  </div>
+  if (error || !profile) return (
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
+      <Header />
+      <main className="main-container" style={{ textAlign: 'center', paddingTop: '100px' }}>
+        <p className="meta">{error || "Não encontrado"}</p>
+        <button onClick={() => router.push('/')} style={{ marginTop: '20px' }}>Voltar</button>
+      </main>
+    </div>
+  )
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main style={{ flexGrow: 1, width: '100%' }}>
-        {/* Banner Section com mais altura */}
-        <div style={{ width: '100%', height: '320px', backgroundColor: 'var(--line-color)', backgroundImage: profile.banner_url ? `url(${getOptimizedCloudinaryUrl(profile.banner_url, { width: 1200 })})` : 'none', backgroundSize: 'cover', backgroundPosition: 'center', borderBottom: '1px solid var(--line-color)' }} />
+      <main className="main-container">
         
-        {/* Content Container mais largo */}
-        <div style={{ maxWidth: '1200px', margin: '-80px auto 0 auto', padding: '0 60px 80px 60px' }}>
-          
-          {/* Profile Header */}
-          <div style={{ display: 'flex', gap: '40px', alignItems: 'flex-end', marginBottom: '50px' }}>
-            <div style={{ width: '140px', height: '140px', border: '1px solid var(--border)', backgroundColor: 'var(--bg)', flexShrink: 0 }}>
-              <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-                {profile.avatar_url ? <img src={getOptimizedCloudinaryUrl(profile.avatar_url, { width: 300, height: 300, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined" style={{ fontSize: '40px' }}>person</span></div>}
-              </div>
-            </div>
+        {/* Banner Noir */}
+        <div className="card-border" style={{ 
+          width: '100%', 
+          height: '200px', 
+          backgroundColor: 'var(--border)', 
+          overflow: 'hidden', 
+          marginBottom: '20px',
+          borderWidth: '2px'
+        }}>
+          {profile.banner_url && (
+            <img 
+              src={getOptimizedCloudinaryUrl(profile.banner_url, { width: 1200 })} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+          )}
+        </div>
+
+        {/* Informações do Perfil */}
+        <div style={{ borderBottom: '2px solid var(--border)', paddingBottom: '40px', marginBottom: '40px' }}>
+          <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             
-            <div style={{ flexGrow: 1, paddingBottom: '5px' }}>
-              <h2 style={{ margin: 0, fontSize: '56px', fontWeight: 'bold', lineHeight: 1, letterSpacing: '-2px' }}>{profile.username}</h2>
-              <div style={{ display: 'flex', gap: '25px', marginTop: '20px', fontSize: '15px', color: 'var(--text-secondary-color)' }}>
-                <span><strong style={{ color: 'var(--text-primary-color)' }}>{social.followers}</strong> seguidores</span>
-                <span><strong style={{ color: 'var(--text-primary-color)' }}>{social.following}</strong> seguindo</span>
-              </div>
+            {/* Avatar Quadrado Are.na */}
+            <div className="card-border" style={{ width: '100px', height: '100px', backgroundColor: 'var(--bg)', flexShrink: 0, borderWidth: '2px' }}>
+              {profile.avatar_url ? (
+                <img src={getOptimizedCloudinaryUrl(profile.avatar_url, { width: 200, height: 200, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '40px' }}>person</span>
+                </div>
+              )}
             </div>
 
-            <div style={{ paddingBottom: '5px' }}>
-              {isOwner ? (
-                <button onClick={() => router.push(`/profile/${id}/edit`)} style={buttonStyle}>Configurações de Perfil</button>
-              ) : (
-                <button onClick={handleFollow} disabled={followLoading} style={{ ...buttonStyle, background: social.isFollowing ? 'transparent' : 'var(--text-primary-color)', color: social.isFollowing ? 'var(--text-primary-color)' : 'var(--background-color)' }}>
-                  {followLoading ? '...' : (social.isFollowing ? 'Seguindo' : 'Seguir')}
-                </button>
+            <div style={{ flexGrow: 1, minWidth: '250px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px', marginBottom: '15px' }}>
+                <h2 style={{ fontSize: '28px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '-1px' }}>{profile.username}</h2>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  {isOwner ? (
+                    <button onClick={() => router.push(`/profile/${id}/edit`)} style={{ height: '32px', fontSize: '10px' }}>EDITAR PERFIL</button>
+                  ) : (                    <button onClick={handleFollow} disabled={followLoading} style={{ height: '32px', fontSize: '10px', backgroundColor: social.isFollowing ? 'transparent' : 'var(--text)', color: social.isFollowing ? 'var(--text)' : 'var(--bg)' }}>
+                      {social.isFollowing ? 'SEGUINDO' : 'SEGUIR'}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+                <span className="meta">{social.followers} SEGUIDORES</span>
+                <span className="meta">{social.following} SEGUINDO</span>
+                <span className="meta">{photobooks.length} ÁLBUNS</span>
+              </div>
+
+              {profile.bio && (
+                <p style={{ fontSize: '13px', lineHeight: '1.4', marginBottom: '20px', maxWidth: '600px' }}>{profile.bio}</p>
+              )}
+
+              {/* Links Pessoais Minimalistas */}
+              {profile.links && profile.links.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+                  {profile.links.map((link: any, i: number) => (
+                    <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="meta" style={{ textDecoration: 'underline', color: 'var(--text)' }}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
               )}
             </div>
           </div>
-
-          {/* Links e Bio com mais espaço */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', marginBottom: '80px' }}>
-            {profile.bio && (
-              <div style={{ flex: '2 1 400px' }}>
-                <p style={{ fontSize: '20px', lineHeight: '1.6', whiteSpace: 'pre-wrap', color: 'var(--text-primary-color)' }}>{profile.bio}</p>
-              </div>
-            )}
-            
-            {profile.links && profile.links.length > 0 && (
-              <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-secondary-color)' }}>Links Pessoais</span>
-                {profile.links.map((link: any, i: number) => (
-                  <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary-color)', textDecoration: 'none', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid var(--line-color)', paddingBottom: '8px' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>link</span>
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Grid de Photobooks */}
-          <div style={{ borderTop: '1px solid var(--line-color)', paddingTop: '60px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '50px' }}>
-              <h3 style={{ fontSize: '28px', margin: 0, fontWeight: 'bold' }}>Photobooks <span style={{ color: 'var(--text-secondary-color)', fontSize: '18px', fontWeight: 'normal' }}>— {photobooks.length}</span></h3>
-            </div>
-
-            {photobooks.length === 0 ? (
-              <div style={{ padding: '100px 20px', border: '1px dashed var(--line-color)', textAlign: 'center', color: 'var(--text-secondary-color)', fontSize: '18px' }}>
-                Nenhum photobook publicado ainda.
-              </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '50px' }}>
-                {photobooks.map((pb) => {
-                  const cover = pb.photos?.[0]?.image_url;
-                  const count = pb.photos?.length || 0;
-                  return (
-                    <div key={pb.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                      <div 
-                        onClick={() => router.push(`/photobook/${pb.id}`)} 
-                        style={{ cursor: 'pointer', aspectRatio: '4/3', backgroundColor: 'var(--line-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative', border: '1px solid var(--line-color)' }}
-                      >
-                        {cover ? (
-                          <img src={getOptimizedCloudinaryUrl(cover, { width: 700, height: 525, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
-                        ) : (
-                          <span className="material-symbols-outlined" style={{ fontSize: '64px', color: 'var(--text-secondary-color)' }}>photo_library</span>
-                        )}
-                        <div style={{ position: 'absolute', top: '15px', right: '15px', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)', padding: '5px 10px', fontSize: '11px', fontWeight: 'bold', border: '1px solid var(--line-color)' }}>
-                          {count} {count === 1 ? 'FOTO' : 'FOTOS'}
-                        </div>
-                      </div>
-                      
-                      <div style={{ marginTop: '25px' }}>
-                        <h4 
-                          onClick={() => router.push(`/photobook/${pb.id}`)} 
-                          style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.1', letterSpacing: '-0.5px' }}
-                        >
-                          {pb.title}
-                        </h4>
-                        <p style={{ fontSize: '15px', color: 'var(--text-secondary-color)', margin: '0 0 20px 0', lineHeight: '1.5', height: '45px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                          {pb.description || 'Sem descrição.'}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '15px', borderTop: '1px solid var(--line-color)' }}>
-                          <span style={{ fontSize: '12px', color: 'var(--text-secondary-color)', fontWeight: 'bold', textTransform: 'uppercase' }}>{new Date(pb.created_at).toLocaleDateString()}</span>
-                          {isOwner && (
-                            <button onClick={() => router.push(`/photobook/${pb.id}/edit`)} style={{ background: 'none', border: 'none', fontSize: '12px', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer', color: 'var(--text-primary-color)' }}>Editar Álbum</button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
         </div>
+
+        {/* Grade de Álbuns */}
+        <div className="responsive-grid">
+          {photobooks.map((pb) => {
+            const cover = pb.photos?.[0]?.image_url;
+            return (
+              <div 
+                key={pb.id} 
+                className="card-border" 
+                onClick={() => router.push(`/photobook/${pb.id}`)}
+                style={{ position: 'relative', display: 'flex', flexDirection: 'column', cursor: 'pointer', overflow: 'hidden' }}
+              >
+                <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
+                  {cover ? (
+                    <img src={getOptimizedCloudinaryUrl(cover, { width: 500, height: 500, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
+                    </div>
+                  )}
+                </div>
+                <div style={{ padding: '12px', borderTop: '2px solid var(--border)' }}>
+                  <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', lineHeight: '1.1' }}>{pb.title}</h4>
+                  <span className="meta" style={{ marginTop: '4px', fontSize: '9px', opacity: 0.7 }}>{pb.photos?.length || 0} fotos</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {photobooks.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '60px', border: '2px dashed var(--border)' }}>
+            <p className="meta">Nenhum álbum publicado.</p>
+          </div>
+        )}
       </main>
     </div>
   )

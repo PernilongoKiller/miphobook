@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useSupabase } from '@/lib/SupabaseProvider'
-import { useTheme } from '@/lib/ThemeProvider'
 import Header from '@/components/Header'
 import Skeleton from '@/components/Skeleton'
 
@@ -14,37 +13,26 @@ export default function EditProfilePage() {
   
   const [username, setUsername] = useState('')
   const [bio, setBio] = useState('')
-  const [links, setLinks] = useState<any[]>([])
+  const [links, setLinks] = useState<{ label: string, url: string }[]>([])
   const [avatarUrl, setAvatarUrl] = useState('')
   const [bannerUrl, setBannerUrl] = useState('')
   
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
       if (!supabase || !id) return
-      
-      // SEGURANÇA MÁXIMA: Verifica se o usuário logado é o dono do perfil
       const { data: { user: currentUser } } = await supabase.auth.getUser()
       if (!currentUser || currentUser.id !== id) {
-        console.error("Acesso negado: Você não é o dono deste perfil.")
         router.replace(`/profile/${id}`)
         return
       }
 
-      const { data, error: fetchError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      if (fetchError) {
-        setError("Erro ao carregar dados do perfil.")
-      } else if (data) {
+      const { data } = await supabase.from('users').select('*').eq('id', id).single()
+      if (data) {
         setUsername(data.username || '')
         setBio(data.bio || '')
         setLinks(data.links || [])
@@ -53,7 +41,6 @@ export default function EditProfilePage() {
       }
       setLoading(false)
     }
-
     checkAuthAndFetch()
   }, [id, supabase, router])
 
@@ -62,7 +49,6 @@ export default function EditProfilePage() {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('upload_preset', 'miphobook_unsigned_upload')
-    formData.append('cloud_name', CLOUDINARY_CLOUD_NAME)
 
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
       method: 'POST',
@@ -89,80 +75,97 @@ export default function EditProfilePage() {
     }
   }
 
-  const buttonStyle: React.CSSProperties = {
-    background: 'transparent',
-    border: '1px solid var(--text-primary-color)',
-    padding: '10px 20px',
-    fontSize: '14px',
-    color: 'var(--text-primary-color)',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-    transition: '0.2s'
+  const addLink = () => setLinks([...links, { label: '', url: '' }])
+  const removeLink = (index: number) => setLinks(links.filter((_, i) => i !== index))
+  const updateLink = (index: number, field: 'label' | 'url', value: string) => {
+    const newLinks = [...links]
+    newLinks[index][field] = value
+    setLinks(newLinks)
   }
 
   if (loading) return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Header />
-      <main style={{ maxWidth: '600px', margin: '40px auto', width: '100%', padding: '0 20px' }}>
-        <Skeleton width="200px" height="40px" style={{ marginBottom: '30px' }} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-          <div>
-            <Skeleton width="80px" height="18px" style={{ marginBottom: '10px' }} />
-            <Skeleton width="100%" height="120px" />
-          </div>
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <Skeleton width="80px" height="80px" borderRadius="50%" />
-            <Skeleton width="150px" height="20px" />
-          </div>
-          <div>
-            <Skeleton width="80px" height="18px" style={{ marginBottom: '5px' }} />
-            <Skeleton width="100%" height="45px" />
-          </div>
-          <div>
-            <Skeleton width="50px" height="18px" style={{ marginBottom: '5px' }} />
-            <Skeleton width="100%" height="120px" />
-          </div>
-        </div>
+      <main className="main-container">
+        <Skeleton height="40px" width="200px" style={{ marginBottom: '40px' }} />
+        <Skeleton height="400px" width="100%" />
       </main>
     </div>
   )
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main style={{ maxWidth: '600px', margin: '40px auto', width: '100%', padding: '0 20px' }}>
-        <h2 style={{ fontSize: '32px', marginBottom: '30px' }}>Configurações</h2>
+      <main className="main-container" style={{ maxWidth: '600px' }}>
+        <h2 style={{ fontSize: '14px', fontWeight: '900', textTransform: 'uppercase', marginBottom: '40px', borderBottom: '2px solid var(--border)', paddingBottom: '10px' }}>Configurações de Perfil</h2>
         
-        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '10px', fontSize: '14px', fontWeight: 'bold' }}>Banner</label>
-            <div style={{ height: '120px', backgroundColor: 'var(--line-color)', backgroundImage: `url(${bannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', position: 'relative', border: '1px solid var(--line-color)' }}>
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+          
+          {/* BANNER EDIT */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <span className="meta">Banner do Perfil</span>
+            <div className="card-border" style={{ height: '120px', backgroundColor: 'var(--border)', position: 'relative', overflow: 'hidden' }}>
+              {bannerUrl && <img src={bannerUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
               <input type="file" accept="image/*" onChange={async (e) => { if(e.target.files?.[0]) setBannerUrl(await handleUpload(e.target.files[0])) }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
-              {!bannerUrl && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '12px' }}>Clique para subir banner</div>}
+              <div style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'var(--bg)', padding: '4px 8px', fontSize: '9px', fontWeight: '900', border: '1px solid var(--border)' }}>ALTERAR BANNER</div>
             </div>
           </div>
 
+          {/* AVATAR EDIT */}
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: 'var(--line-color)', overflow: 'hidden', border: '1px solid var(--line-color)' }}>
+            <div className="card-border" style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg)', overflow: 'hidden', flexShrink: 0 }}>
               {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined">person</span></div>}
             </div>
-            <input type="file" accept="image/*" onChange={async (e) => { if(e.target.files?.[0]) setAvatarUrl(await handleUpload(e.target.files[0])) }} style={{ fontSize: '12px' }} />
+            <div style={{ position: 'relative' }}>
+               <button type="button" style={{ height: '30px', fontSize: '10px' }}>ALTERAR FOTO</button>
+               <input type="file" accept="image/*" onChange={async (e) => { if(e.target.files?.[0]) setAvatarUrl(await handleUpload(e.target.files[0])) }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+            </div>
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 'bold' }}>Username</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required style={{ width: '100%', padding: '12px', border: '1px solid var(--line-color)', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label className="meta">Nome de Usuário</label>
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', fontSize: '14px' }} />
           </div>
 
-          <div>
-            <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', fontWeight: 'bold' }}>Bio</label>
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} style={{ width: '100%', padding: '12px', border: '1px solid var(--line-color)', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)', resize: 'none' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label className="meta">Bio / Manifestos</label>
+            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', fontSize: '14px', resize: 'none' }} />
           </div>
 
-          <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
-            <button type="submit" disabled={saving} style={{ ...buttonStyle, background: 'var(--text-primary-color)', color: 'var(--background-color)' }}>{saving ? 'Salvando...' : 'Salvar Alterações'}</button>
-            <button type="button" onClick={() => router.back()} style={buttonStyle}>Cancelar</button>
+          {/* SEÇÃO DE LINKS */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <label className="meta">Links Pessoais</label>
+              <button type="button" onClick={addLink} style={{ height: '24px', fontSize: '9px' }}>+ ADICIONAR</button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {links.map((link, index) => (
+                <div key={index} style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <input 
+                    placeholder="Ex: Instagram" 
+                    value={link.label} 
+                    onChange={(e) => updateLink(index, 'label', e.target.value)}
+                    style={{ flex: 1, padding: '8px', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', fontSize: '12px', outline: 'none' }}
+                  />
+                  <input 
+                    placeholder="https://..." 
+                    value={link.url} 
+                    onChange={(e) => updateLink(index, 'url', e.target.value)}
+                    style={{ flex: 2, padding: '8px', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', fontSize: '12px', outline: 'none' }}
+                  />
+                  <button type="button" onClick={() => removeLink(index)} style={{ border: 'none', background: 'none', padding: '5px', color: 'var(--text)', cursor: 'pointer' }}>✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
+            <button type="submit" disabled={saving} style={{ flexGrow: 1, backgroundColor: 'var(--text)', color: 'var(--bg)', height: '45px' }}>
+              {saving ? 'SALVANDO...' : 'SALVAR ALTERAÇÕES'}
+            </button>
+            <button type="button" onClick={() => router.back()} style={{ height: '45px' }}>CANCELAR</button>
           </div>
         </form>
       </main>

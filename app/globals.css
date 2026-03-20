@@ -4,50 +4,49 @@
   --bg: #ffffff;
   --text: #000000;
   --muted: #666666;
-  --border: #000000; /* Bordas agora são pretas para dar estrutura */
-  --line-light: #eeeeee;
+  --border: #eeeeee;
   --accent: #000000;
 }
 
 [data-theme="dark"] {
   --bg: #000000;
   --text: #ffffff;
-  --muted: #aaaaaa;
-  --border: #ffffff;
-  --line-light: #222222;
+  --muted: #888888;
+  --border: #222222;
   --accent: #ffffff;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg);
   color: var(--text);
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.2;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ESTRUTURA BRUTALISTA (BORDAS PRETAS) */
+/* ESTILO ULTRA-MINIMALISTA */
 .card-border {
-  border: 1px solid var(--border);
+  border: none;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  transition: opacity 0.2s ease;
 }
 
-.thin-border {
-  border: 1px solid var(--line-light);
+.card-border:hover {
+  opacity: 0.7;
 }
 
 button {
   background: transparent;
-  border: 1px solid var(--border);
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 700;
+  border: 1px solid var(--text);
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
   color: var(--text);
   cursor: pointer;
-  border-radius: 0;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.1s ease;
+  letter-spacing: 0.5px;
 }
 
 button:hover:not(:disabled) {
@@ -55,89 +54,104 @@ button:hover:not(:disabled) {
   color: var(--bg);
 }
 
-/* INPUTS COM FUNDO SUTIL PARA NÃO "SUMIREM" */
-input, textarea {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px;
-  outline: none;
-  border-radius: 0;
-}
-
-input:focus {
-  box-shadow: 2px 2px 0px var(--border);
-}
-
 .meta {
   font-size: 10px;
-  font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
-.parent-hover:hover .show-on-hover {
-  opacity: 1;
+/* GRID LIMPO */
+.main-container {
+  flex-grow: 1;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 40px 20px;
 }
 
-.show-on-hover {
-  opacity: 0;
-  transition: opacity 0.15s ease;
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 30px;
 }
 
-/* AJUSTES PARA CELULAR (RESPONSIVIDADE) */
+.hide-on-mobile {
+  display: flex;
+}
+
 @media (max-width: 768px) {
-  .show-on-hover {
-    opacity: 1 !important; /* Em telas touch, as ações devem estar visíveis */
+  .responsive-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
   }
-
-  /* Ajustar containers globais */
-  main {
-    padding: 20px 15px !important;
-  }
-
-  /* Reduzir títulos e textos */
-  h1 { font-size: 20px !important; }
-  h2 { font-size: 18px !important; }
-
-  /* Ajustar botões para toque */
-  button {
-    padding: 10px 15px !important;
-    font-size: 11px !important;
+  
+  .main-container {
+    padding: 20px 12px !important;
+    padding-bottom: 80px !important;
   }
 
   .hide-on-mobile {
     display: none !important;
   }
 
-  /* BARRA INFERIOR ESTILO APP */
   .mobile-bottom-nav {
     display: flex !important;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 65px;
+    height: 50px;
     background: var(--bg);
     border-top: 1px solid var(--border);
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom); /* Suporte para iPhone "notch" */
-  }
-
-  /* Ajustar o padding do main para não cobrir a barra inferior */
-  main {
-    padding-bottom: 100px !important;
-  }
-
-  .full-width-mobile {
-    width: 100vw !important;
-    margin-left: -15px !important; /* Compensa o padding do main */
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
 .mobile-bottom-nav {
   display: none;
+}
+
+/* SKELETON ANIMATION */
+.skeleton {
+  background-color: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+}
+
+[data-theme="dark"] .skeleton::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(0, 0, 0, 0)
+  );
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }

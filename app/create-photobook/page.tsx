@@ -54,8 +54,8 @@ export default function CreatePhotobookPage() {
         .select()
 
       if (error) {
-        console.error('Full Supabase Error object:', error)
-        toast(`Erro: ${error.message}`, 'error')
+        console.error('Erro detalhado do Supabase:', error.message, error.details, error.hint)
+        toast(`Erro: ${error.message || 'Falha ao salvar no banco.'}`, 'error')
         setLoading(false)
         return
       }
@@ -77,83 +77,44 @@ export default function CreatePhotobookPage() {
       display: 'flex',
       flexDirection: 'column',
       minHeight: '100vh',
-      backgroundColor: 'var(--background-color)',
-      color: 'var(--text-primary-color)',
+      backgroundColor: 'var(--bg)',
+      color: 'var(--text)',
     }}>
       <Header />
 
-      <main style={{
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '40px',
-        maxWidth: '600px',
-        margin: 'auto',
-      }}>
-        <div style={{
-          backgroundColor: 'var(--background-color)',
-          padding: '40px',
-          border: '1px solid var(--line-color)',
+      <main className="main-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="card-border" style={{
+          padding: '30px',
           width: '100%',
-          textAlign: 'center',
+          maxWidth: '400px',
+          backgroundColor: 'var(--bg)',
         }}>
-          <h2 style={{ marginBottom: '20px', fontSize: '28px', color: 'var(--text-primary-color)' }}>Criar Novo Photobook</h2>
+          <h2 style={{ marginBottom: '20px', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase' }}>Novo Photobook</h2>
+          
           <form onSubmit={handleCreatePhotobook} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <input
               type="text"
-              placeholder="Título do Photobook"
+              placeholder="Título"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              style={{
-                padding: '12px',
-                border: '1px solid var(--line-color)',
-                borderRadius: '0px',
-                fontSize: '14px',
-                backgroundColor: 'var(--background-color)',
-                color: 'var(--text-primary-color)'
-              }}
+              style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none' }}
             />
             <textarea
               placeholder="Descrição (opcional)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              style={{
-                padding: '12px',
-                border: '1px solid var(--line-color)',
-                borderRadius: '0px',
-                fontSize: '14px',
-                backgroundColor: 'var(--background-color)',
-                color: 'var(--text-primary-color)'
-              }}
+              rows={3}
+              style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', resize: 'none' }}
             />
             <button
               type="submit"
               disabled={loading}
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--text-primary-color)',
-                padding: '6px 12px',
-                fontSize: '14px',
-                color: 'var(--text-primary-color)',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'background-color 0.1s ease-in-out, color 0.1s ease-in-out',
-                opacity: loading ? 0.6 : 1,
-              }}
-              onMouseOver={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = 'var(--text-primary-color)'; e.currentTarget.style.color = 'var(--background-color)'; }}}
-              onMouseOut={(e) => { if (!loading) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-primary-color)'; }}}
+              style={{ height: '40px', fontSize: '11px' }}
             >
               {loading ? 'Criando...' : 'Criar Photobook'}
             </button>
           </form>
-          {message && (
-            <p style={{ marginTop: '20px', color: 'var(--text-secondary-color)' }}>
-              {message}
-            </p>
-          )}
         </div>
       </main>
     </div>

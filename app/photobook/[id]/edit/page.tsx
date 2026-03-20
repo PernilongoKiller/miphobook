@@ -185,10 +185,10 @@ export default function EditPhotobookPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
         <Header />
         <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', maxWidth: '600px', margin: 'auto', width: '100%' }}>
-          <div style={{ backgroundColor: 'var(--background-color)', padding: '40px', border: '1px solid var(--line-color)', width: '100%', textAlign: 'center' }}>
+          <div style={{ backgroundColor: 'var(--bg)', padding: '40px', border: '1px solid var(--border)', width: '100%', textAlign: 'center' }}>
             <Skeleton width="60%" height="32px" style={{ margin: '0 auto 30px auto' }} />
             <Skeleton width="100%" height="45px" style={{ marginBottom: '15px' }} />
             <Skeleton width="100%" height="120px" style={{ marginBottom: '15px' }} />
@@ -203,14 +203,14 @@ export default function EditPhotobookPage() {
     return (
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh',
-        backgroundColor: 'var(--background-color)', color: 'red', fontSize: '24px',
+        backgroundColor: 'var(--bg)', color: 'red', fontSize: '24px',
       }}>
         {error}
         <button
           onClick={() => router.back()}
           style={{
-            marginTop: '20px', background: 'transparent', border: '1px solid var(--text-primary-color)', padding: '6px 12px',
-            fontSize: '14px', color: 'var(--text-primary-color)', cursor: 'pointer',
+            marginTop: '20px', background: 'transparent', border: '1px solid var(--text)', padding: '6px 12px',
+            fontSize: '14px', color: 'var(--text)', cursor: 'pointer',
           }}
         >
           Voltar
@@ -224,8 +224,8 @@ export default function EditPhotobookPage() {
       display: 'flex',
       flexDirection: 'column',
       minHeight: '100vh',
-      backgroundColor: 'var(--background-color)',
-      color: 'var(--text-primary-color)',
+      backgroundColor: 'var(--bg)',
+      color: 'var(--text)',
     }}>
       <Header />
 
@@ -240,13 +240,13 @@ export default function EditPhotobookPage() {
         margin: 'auto',
       }}>
         <div style={{
-          backgroundColor: 'var(--background-color)',
+          backgroundColor: 'var(--bg)',
           padding: '40px',
-          border: '1px solid var(--line-color)',
+          border: '1px solid var(--border)',
           width: '100%',
           textAlign: 'center',
         }}>
-          <h2 style={{ marginBottom: '20px', fontSize: '28px', color: 'var(--text-primary-color)' }}>Editar Photobook</h2>
+          <h2 style={{ marginBottom: '20px', fontSize: '28px', color: 'var(--text)' }}>Editar Photobook</h2>
           <form onSubmit={handleUpdatePhotobook} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <input
               type="text"
@@ -256,11 +256,11 @@ export default function EditPhotobookPage() {
               required
               style={{
                 padding: '12px',
-                border: '1px solid var(--line-color)',
+                border: '1px solid var(--border)',
                 borderRadius: '0px',
                 fontSize: '14px',
-                backgroundColor: 'var(--background-color)',
-                color: 'var(--text-primary-color)'
+                backgroundColor: 'var(--bg)',
+                color: 'var(--text)'
               }}
             />
             <textarea
@@ -270,11 +270,11 @@ export default function EditPhotobookPage() {
               rows={4}
               style={{
                 padding: '12px',
-                border: '1px solid var(--line-color)',
+                border: '1px solid var(--border)',
                 borderRadius: '0px',
                 fontSize: '14px',
-                backgroundColor: 'var(--background-color)',
-                color: 'var(--text-primary-color)'
+                backgroundColor: 'var(--bg)',
+                color: 'var(--text)'
               }}
             />
             <button
@@ -282,16 +282,16 @@ export default function EditPhotobookPage() {
               disabled={saving}
               style={{
                 background: 'transparent',
-                border: '1px solid var(--text-primary-color)',
+                border: '1px solid var(--text)',
                 padding: '6px 12px',
                 fontSize: '14px',
-                color: 'var(--text-primary-color)',
+                color: 'var(--text)',
                 cursor: saving ? 'not-allowed' : 'pointer',
                 transition: 'background-color 0.1s ease-in-out, color 0.1s ease-in-out',
                 opacity: saving ? 0.6 : 1,
               }}
-              onMouseOver={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = 'var(--text-primary-color)'; e.currentTarget.style.color = 'var(--background-color)'; }}}
-              onMouseOut={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-primary-color)'; }}}
+              onMouseOver={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = 'var(--text)'; e.currentTarget.style.color = 'var(--bg)'; }}}
+              onMouseOut={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text)'; }}}
             >
               {saving ? 'Atualizando...' : 'Atualizar Photobook'}
             </button>
@@ -310,7 +310,7 @@ export default function EditPhotobookPage() {
               transition: 'background-color 0.1s ease-in-out, color 0.1s ease-in-out',
               opacity: saving ? 0.6 : 1,
             }}
-            onMouseOver={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = '#ff4d4f'; e.currentTarget.style.color = 'var(--background-color)'; }}}
+            onMouseOver={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = '#ff4d4f'; e.currentTarget.style.color = 'var(--bg)'; }}}
             onMouseOut={(e) => { if (!saving) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#ff4d4f'; }}}
           >
             {saving ? 'Apagando...' : 'Apagar Photobook'}

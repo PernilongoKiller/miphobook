@@ -98,28 +98,28 @@ export default function UploadPhotoPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--background-color)', color: 'var(--text-primary-color)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
       <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-        <div style={{ backgroundColor: 'var(--background-color)', padding: '40px', border: '1px solid var(--line-color)', width: '100%', textAlign: 'center' }}>
+        <div style={{ backgroundColor: 'var(--bg)', padding: '40px', border: '1px solid var(--border)', width: '100%', textAlign: 'center' }}>
           <h2 style={{ marginBottom: '10px', fontSize: '28px', fontFamily: '"Alfa Slab One", serif' }}>Adicionar Momentos</h2>
-          <p style={{ color: 'var(--text-secondary-color)', marginBottom: '30px', fontSize: '14px' }}>Selecione uma ou mais fotos para o seu diário visual.</p>
+          <p style={{ color: 'var(--muted)', marginBottom: '30px', fontSize: '14px' }}>Selecione uma ou mais fotos para o seu diário visual.</p>
           
           <form onSubmit={handleUploadPhotos} style={{ display: 'flex', flexDirection: 'column', gap: '25px', position: 'relative' }}>
             
             {loading && (
-              <div style={{ position: 'absolute', top: '-10px', left: 0, width: '100%', height: '2px', backgroundColor: 'var(--line-color)' }}>
+              <div style={{ position: 'absolute', top: '-10px', left: 0, width: '100%', height: '2px', backgroundColor: 'var(--border)' }}>
                 <div style={{ 
                   height: '100%', 
-                  backgroundColor: 'var(--text-primary-color)', 
+                  backgroundColor: 'var(--text)', 
                   width: `${(uploadProgress.current / uploadProgress.total) * 100}%`,
                   transition: 'width 0.3s ease'
                 }} />
               </div>
             )}
 
-            <div style={{ border: '2px dashed var(--line-color)', padding: '40px', position: 'relative', cursor: 'pointer' }}>
+            <div style={{ border: '2px dashed var(--border)', padding: '40px', position: 'relative', cursor: 'pointer' }}>
               <input
                 type="file"
                 accept="image/*"
@@ -129,24 +129,24 @@ export default function UploadPhotoPage() {
                 required
                 style={{ position: 'absolute', inset: 0, opacity: 0, cursor: loading ? 'not-allowed' : 'pointer', width: '100%' }}
               />
-              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--text-secondary-color)', marginBottom: '10px' }}>add_a_photo</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--muted)', marginBottom: '10px' }}>add_a_photo</span>
               <p style={{ margin: 0, fontSize: '14px' }}>{selectedFiles.length > 0 ? `${selectedFiles.length} arquivos selecionados` : 'Clique ou arraste fotos aqui'}</p>
             </div>
 
             {selectedFiles.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '4px', maxHeight: '400px', overflowY: 'auto', padding: '10px', border: '1px solid var(--line-color)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '4px', maxHeight: '400px', overflowY: 'auto', padding: '10px', border: '1px solid var(--border)' }}>
                 {selectedFiles.map((file, idx) => (
-                  <div key={idx} style={{ aspectRatio: '1/1', backgroundColor: 'var(--line-color)', overflow: 'hidden', position: 'relative' }}>
+                  <div key={idx} style={{ aspectRatio: '1/1', backgroundColor: 'var(--border)', overflow: 'hidden', position: 'relative' }}>
                     <img src={URL.createObjectURL(file)} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: uploadStatus[idx] === 'uploading' ? 0.5 : 1 }} />
                     
                     {uploadStatus[idx] === 'uploading' && (
                        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.3)' }}>
-                          <div className="spinner" style={{ width: '20px', height: '20px', border: '2px solid var(--text-primary-color)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+                          <div className="spinner" style={{ width: '20px', height: '20px', border: '2px solid var(--text)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
                        </div>
                     )}
 
                     {uploadStatus[idx] === 'done' && (
-                       <div style={{ position: 'absolute', top: '5px', right: '5px', backgroundColor: 'var(--text-primary-color)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                       <div style={{ position: 'absolute', top: '5px', right: '5px', backgroundColor: 'var(--text)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>check</span>
                        </div>
                     )}
@@ -167,21 +167,21 @@ export default function UploadPhotoPage() {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               disabled={loading}
-              style={{ padding: '15px', border: '1px solid var(--line-color)', fontSize: '14px', backgroundColor: 'transparent', color: 'var(--text-primary-color)', resize: 'none', outline: 'none' }}
+              style={{ padding: '15px', border: '1px solid var(--border)', fontSize: '14px', backgroundColor: 'transparent', color: 'var(--text)', resize: 'none', outline: 'none' }}
             />
 
             <button
               type="submit"
               disabled={loading || selectedFiles.length === 0}
               style={{
-                background: loading ? 'transparent' : 'var(--text-primary-color)',
-                border: '1px solid var(--text-primary-color)',
+                background: loading ? 'transparent' : 'var(--text)',
+                border: '1px solid var(--text)',
                 padding: '12px',
                 fontSize: '11px',
                 textTransform: 'uppercase',
                 letterSpacing: '1px',
                 fontWeight: '900',
-                color: loading ? 'var(--text-primary-color)' : 'var(--background-color)',
+                color: loading ? 'var(--text)' : 'var(--bg)',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s',
               }}
@@ -197,7 +197,7 @@ export default function UploadPhotoPage() {
           `}</style>
 
           {message && (
-            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: 'var(--line-color)', fontSize: '13px' }}>
+            <div style={{ marginTop: '20px', padding: '15px', backgroundColor: 'var(--border)', fontSize: '13px' }}>
               {message}
             </div>
           )}
