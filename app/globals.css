@@ -25,69 +25,105 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ESTILO ULTRA-MINIMALISTA */
+/* ESTILO ULTRA-MINIMALISTA V2 */
 .card-border {
-  border: none;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-  transition: opacity 0.2s ease;
+  border: 1px solid var(--border);
+  padding: 10px;
+  background-color: var(--bg);
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .card-border:hover {
-  opacity: 0.7;
+  border-color: var(--text);
+  box-shadow: 4px 4px 0px var(--text);
+  transform: translate(-2px, -2px);
+  z-index: 2;
+}
+
+.card-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--text);
+  color: var(--bg);
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 900;
+  z-index: 5;
 }
 
 button {
   background: transparent;
   border: 1px solid var(--text);
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 8px 15px;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text);
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
 }
 
 button:hover:not(:disabled) {
   background: var(--text);
   color: var(--bg);
+  box-shadow: 3px 3px 0px var(--border);
 }
 
 .meta {
   font-size: 10px;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  font-weight: 500;
 }
 
-/* GRID LIMPO */
+/* GRID DINÂMICO */
 .main-container {
   flex-grow: 1;
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  padding: 40px 20px;
+  padding: 60px 20px;
 }
 
 .responsive-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 40px 30px;
+  grid-auto-flow: dense;
+}
+
+.card-large {
+  grid-column: span 2;
+  grid-row: span 2;
 }
 
 .hide-on-mobile {
   display: flex;
 }
 
+.mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .responsive-grid {
     grid-template-columns: 1fr 1fr !important;
-    gap: 12px !important;
+    gap: 15px !important;
+  }
+  
+  .card-large {
+    grid-column: span 2 !important;
+    grid-row: auto !important;
   }
   
   .main-container {
-    padding: 20px 12px !important;
+    padding: 30px 15px !important;
     padding-bottom: 80px !important;
   }
 
@@ -109,10 +145,6 @@ button:hover:not(:disabled) {
     z-index: 1000;
     padding-bottom: env(safe-area-inset-bottom);
   }
-}
-
-.mobile-bottom-nav {
-  display: none;
 }
 
 /* SKELETON ANIMATION */

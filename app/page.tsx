@@ -16,58 +16,69 @@ export default function Home() {
   const [photobooks, setPhotobooks] = useState<any[]>([])
   const [suggestedUsers, setSuggestedUsers] = useState<any[]>([])
 
-  const fetchPhotobooks = useCallback(async (currentId: string | null, tab: 'explore' | 'following') => {
+  const fetchPhotobooks = useCallback(async (currentId: string | null, tab: 'explore' | 'following', abortSignal?: AbortController) => {
     if (!supabase) return
     setLoading(true)
     
     try {
+      let query = supabase
+        .from('photobooks')
+        .select(`
+          id, title, description, user_id, created_at,
+          users (username, avatar_url),
+          photos (image_url, created_at)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(12)
+
       if (tab === 'following' && currentId) {
-        const { data: followingData } = await supabase.from('follows').select('following_id').eq('follower_id', currentId)
+        // Primeiro pegamos quem o usuário segue para filtrar
+        const { data: followingData, error: followError } = await supabase
+          .from('follows')
+          .select('following_id')
+          .eq('follower_id', currentId)
+        
+        if (followError) throw followError
+        
         const followingIds = followingData?.map(f => f.following_id) || []
         
         if (followingIds.length === 0) {
           const { data: popularUsers } = await supabase.from('users').select('id, username, avatar_url').limit(5)
           setSuggestedUsers(popularUsers || [])
           setPhotobooks([])
-          setLoading(false)
           return
         }
-
-        const { data, error } = await supabase
-          .from('photobooks')
-          .select(`
-            id, title, description, user_id, created_at,
-            users (username, avatar_url),
-            photos (image_url, created_at)
-          `)
-          .in('user_id', followingIds)
-          .order('created_at', { ascending: false })
-          .limit(12)
         
-        if (error) throw error
-        setPhotobooks(data || [])
-      } else {
-        const { data, error } = await supabase
-          .from('photobooks')
-          .select(`
-            id, title, description, user_id, created_at,
-            users (username, avatar_url),
-            photos (image_url, created_at)
-          `)
-          .order('created_at', { ascending: false })
-          .limit(12)
-
-        if (error) throw error
-        setPhotobooks(data || [])
+        query = query.in('user_id', followingIds)
       }
+
+      const { data, error } = await query
+      
+      if (abortSignal?.signal.aborted) return
+      if (error) throw error
+      setPhotobooks(data || [])
     } catch (err: any) { 
-      console.error("Erro na busca de photobooks:", err?.message || err) 
-    } finally { setLoading(false) }
+      if (err?.name !== 'AbortError') {
+        console.error("Erro na busca de photobooks:", err?.message || err) 
+      }
+    } finally { 
+      if (!abortSignal?.signal.aborted) setLoading(false) 
+    }
   }, [supabase])
 
   useEffect(() => {
-    fetchPhotobooks(user?.id || null, activeTab)
-  }, [user, activeTab, fetchPhotobooks])
+    const controller = new AbortController()
+    
+    // Pequeno delay para evitar disparos múltiplos em mudanças rápidas de estado
+    const timer = setTimeout(() => {
+      fetchPhotobooks(user?.id || null, activeTab, controller)
+    }, 50)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
+  }, [user?.id, activeTab, fetchPhotobooks])
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
@@ -99,32 +110,52 @@ export default function Home() {
 
         {loading ? (
           <div className="responsive-grid">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i}>
-                <Skeleton height="200px" width="100%" />
-                <div style={{ padding: '10px 0' }}><Skeleton height="15px" width="70%" /></div>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="card-border">
+                <Skeleton height="280px" width="100%" />
+                <div style={{ padding: '15px 0 5px 0' }}><Skeleton height="15px" width="70%" /></div>
+                <Skeleton height="10px" width="40%" />
               </div>
             ))}
           </div>
         ) : photobooks.length > 0 ? (
           <div className="responsive-grid">
-            {photobooks.map((pb) => {
-              const cover = pb.photos?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())?.[0]?.image_url;
+            {photobooks.map((pb, idx) => {
+              const photos = pb.photos || [];
+              const cover = photos.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())?.[0]?.image_url;
+              const isLarge = photos.length >= 6 || (idx === 0 && activeTab === 'explore');
+              
               return (
                 <div 
                   key={pb.id} 
-                  className="card-border" 
+                  className={`card-border ${isLarge ? 'card-large' : ''}`}
                   onClick={() => router.push(`/photobook/${pb.id}`)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <div style={{ aspectRatio: '1/1', overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
-                    {cover && (
-                      <img src={getOptimizedCloudinaryUrl(cover, { width: 400, height: 400, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {photos.length > 0 && (
+                    <div className="card-badge">{photos.length} {photos.length === 1 ? 'MOMENTO' : 'MOMENTOS'}</div>
+                  )}
+                  
+                  <div style={{ flexGrow: 1, overflow: 'hidden', backgroundColor: 'var(--border)', position: 'relative' }}>
+                    {cover ? (
+                      <img 
+                        src={getOptimizedCloudinaryUrl(cover, { width: isLarge ? 800 : 400, height: isLarge ? 800 : 400, crop: 'fill' })} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} 
+                        alt={pb.title}
+                      />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                         <span className="meta">Sem fotos</span>
+                      </div>
                     )}
                   </div>
-                  <div style={{ padding: '10px 0' }}>
-                    <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '500' }}>{pb.title}</h4>
-                    <span className="meta">{pb.users?.username}</span>
+                  
+                  <div style={{ padding: '15px 5px 5px 5px' }}>
+                    <h4 style={{ margin: '0 0 4px 0', fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{pb.title}</h4>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span className="meta">{pb.users?.username}</span>
+                      <span className="meta" style={{ fontSize: '9px' }}>{new Date(pb.created_at).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })}</span>
+                    </div>
                   </div>
                 </div>
               )

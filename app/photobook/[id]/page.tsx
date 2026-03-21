@@ -18,6 +18,26 @@ interface PhotoGroup {
   isLiked: boolean;
 }
 
+const FormattedText = ({ text }: { text: string }) => {
+  if (!text) return null;
+  // Divide o texto por negrito (**...**) e itálico (*...*)
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  
+  return (
+    <span style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} style={{ fontWeight: '800' }}>{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith('*') && part.endsWith('*')) {
+          return <em key={i} style={{ fontStyle: 'italic', opacity: 0.9 }}>{part.slice(1, -1)}</em>;
+        }
+        return part;
+      })}
+    </span>
+  );
+};
+
 export default function PhotobookDetailPage() {
   const router = useRouter()
   const params = useParams()
