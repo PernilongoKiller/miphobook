@@ -130,7 +130,12 @@ export default function EditProfilePage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <label className="meta">Bio / Manifestos</label>
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', fontSize: '14px', resize: 'none' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={4} style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', fontSize: '14px', resize: 'none' }} />
+              <p style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'left', margin: 0 }}>
+                Dica: **negrito**, *itálico*. Quebras de linha funcionam.
+              </p>
+            </div>
           </div>
 
           {/* SEÇÃO DE LINKS */}

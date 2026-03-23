@@ -100,13 +100,18 @@ export default function CreatePhotobookPage() {
               required
               style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none' }}
             />
-            <textarea
-              placeholder="Descrição (opcional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', resize: 'none' }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <textarea
+                placeholder="Descrição (opcional)"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', resize: 'none' }}
+              />
+              <p style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'left', margin: 0 }}>
+                Dica: **negrito**, *itálico*. Quebras de linha funcionam.
+              </p>
+            </div>
             <button
               type="submit"
               disabled={loading}

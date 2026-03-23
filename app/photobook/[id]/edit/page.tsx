@@ -263,20 +263,28 @@ export default function EditPhotobookPage() {
                 color: 'var(--text)'
               }}
             />
-            <textarea
-              placeholder="Descrição (opcional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              style={{
-                padding: '12px',
-                border: '1px solid var(--border)',
-                borderRadius: '0px',
-                fontSize: '14px',
-                backgroundColor: 'var(--bg)',
-                color: 'var(--text)'
-              }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <textarea
+                placeholder="Descrição (opcional)"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                style={{
+                  padding: '12px',
+                  border: '1px solid var(--border)',
+                  borderRadius: '0px',
+                  fontSize: '14px',
+                  backgroundColor: 'var(--bg)',
+                  color: 'var(--text)',
+                  width: '100%',
+                  outline: 'none',
+                  resize: 'vertical'
+                }}
+              />
+              <p style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'left', margin: 0 }}>
+                Dica: **negrito**, *itálico*. Quebras de linha funcionam.
+              </p>
+            </div>
             <button
               type="submit"
               disabled={saving}

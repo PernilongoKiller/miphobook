@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import Header from '@/components/Header'
 import Skeleton from '@/components/Skeleton'
+import FormattedText from '@/components/FormattedText'
 import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
 
 export default function UserProfilePage() {
@@ -164,7 +165,9 @@ export default function UserProfilePage() {
               </div>
 
               {profile.bio && (
-                <p style={{ fontSize: '13px', lineHeight: '1.4', marginBottom: '20px', maxWidth: '600px' }}>{profile.bio}</p>
+                <p style={{ fontSize: '13px', lineHeight: '1.4', marginBottom: '20px', maxWidth: '600px' }}>
+                  <FormattedText text={profile.bio} />
+                </p>
               )}
 
               {/* Links Pessoais Minimalistas */}

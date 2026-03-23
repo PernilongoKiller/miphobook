@@ -84,7 +84,7 @@ export default function Header() {
     <>
       <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 15px', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, backgroundColor: 'var(--bg)', zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <h1 onClick={() => router.push('/')} style={{ margin: 0, fontSize: '15px', fontWeight: '900', cursor: 'pointer', letterSpacing: '-0.5px' }}>miphobook</h1>
+          <h1 onClick={() => router.push('/')} style={{ margin: 0, fontSize: '18px', fontWeight: '400', cursor: 'pointer', fontFamily: '"Alfa Slab One", serif', letterSpacing: '0px' }}>miphobook</h1>
           <div className="hide-on-mobile" ref={searchRef} style={{ position: 'relative', width: '220px' }}>
             <input type="text" placeholder="Pesquisar..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '6px 0', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid var(--border)', color: 'var(--text)', fontSize: '12px', outline: 'none' }} />
             {showResults && (

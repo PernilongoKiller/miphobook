@@ -161,14 +161,19 @@ export default function UploadPhotoPage() {
               </div>
             )}
 
-            <textarea
-              placeholder="Descreva estes momentos..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              disabled={loading}
-              style={{ padding: '15px', border: '1px solid var(--border)', fontSize: '14px', backgroundColor: 'transparent', color: 'var(--text)', resize: 'none', outline: 'none' }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              <textarea
+                placeholder="Descreva estes momentos..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                disabled={loading}
+                style={{ padding: '15px', border: '1px solid var(--border)', fontSize: '14px', backgroundColor: 'transparent', color: 'var(--text)', resize: 'none', outline: 'none' }}
+              />
+              <p style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'left', margin: 0 }}>
+                Dica: **negrito**, *itálico*. Quebras de linha funcionam.
+              </p>
+            </div>
 
             <button
               type="submit"

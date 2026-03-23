@@ -6,6 +6,7 @@ import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
 import Header from '@/components/Header'
 import Skeleton from '@/components/Skeleton'
+import FormattedText from '@/components/FormattedText'
 import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
 
 interface PhotoGroup {
@@ -17,26 +18,6 @@ interface PhotoGroup {
   likes: number;
   isLiked: boolean;
 }
-
-const FormattedText = ({ text }: { text: string }) => {
-  if (!text) return null;
-  // Divide o texto por negrito (**...**) e itálico (*...*)
-  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
-  
-  return (
-    <span style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-      {parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i} style={{ fontWeight: '800' }}>{part.slice(2, -2)}</strong>;
-        }
-        if (part.startsWith('*') && part.endsWith('*')) {
-          return <em key={i} style={{ fontStyle: 'italic', opacity: 0.9 }}>{part.slice(1, -1)}</em>;
-        }
-        return part;
-      })}
-    </span>
-  );
-};
 
 export default function PhotobookDetailPage() {
   const router = useRouter()
@@ -61,7 +42,7 @@ export default function PhotobookDetailPage() {
       const { data: photobookData } = await supabase.from('photobooks').select('*, users(username, avatar_url)').eq('id', id).single()
       setPhotobook(photobookData)
 
-      const { data: photosData } = await supabase.from('photos').select('*').eq('photobook_id', id).order('created_at', { ascending: true })
+      const { data: photosData } = await supabase.from('photos').select('*').eq('photobook_id', id).order('created_at', { ascending: true }).order('id', { ascending: true })
       
       const groups: PhotoGroup[] = [];
       let currentGroup: PhotoGroup | null = null;
@@ -72,12 +53,16 @@ export default function PhotobookDetailPage() {
           const [commentsRes, likesRes, userLikeRes] = await Promise.all([
             supabase.from('photo_comments').select('*, users(username, avatar_url)').eq('photo_id', photo.id).order('created_at', { ascending: true }),
             supabase.from('photo_likes').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
-            currentUser ? supabase.from('photo_likes').select('*').eq('photo_id', photo.id).eq('user_id', currentUser.id).maybeSingle() : Promise.resolve({ data: null })
+            currentUser ? supabase.from('photo_likes').select('id').eq('photo_id', photo.id).eq('user_id', currentUser.id).limit(1) : Promise.resolve({ data: [] })
           ]);
           
+          if (commentsRes.error) console.error('Comments error:', commentsRes.error);
+          if (likesRes.error) console.error('Likes error:', likesRes.error);
+          if (userLikeRes.error) console.error('UserLike error:', userLikeRes.error);
+
           currentGroup = { 
             id: photo.id, description: photo.description || '', createdAt: photo.created_at, 
-            photos: [photo], comments: commentsRes.data || [], likes: likesRes.count || 0, isLiked: !!userLikeRes.data
+            photos: [photo], comments: commentsRes.data || [], likes: likesRes.count || 0, isLiked: !!(userLikeRes.data && userLikeRes.data.length > 0)
           };
           groups.push(currentGroup);
         } else {
@@ -113,28 +98,61 @@ export default function PhotobookDetailPage() {
     
     try {
       if (isPbLiked) {
-        await supabase.from('photobook_likes').delete().eq('photobook_id', id).eq('user_id', currentUser.id)
+        const { error } = await supabase
+          .from('photobook_likes')
+          .delete()
+          .eq('photobook_id', id)
+          .eq('user_id', currentUser.id)
+        
+        if (error) throw error
+        
         setPbLikes(prev => Math.max(0, prev - 1)); 
         setIsPbLiked(false)
       } else {
-        await supabase.from('photobook_likes').insert({ photobook_id: id, user_id: currentUser.id })
+        const { error } = await supabase
+          .from('photobook_likes')
+          .insert({ photobook_id: id, user_id: currentUser.id })
+        
+        if (error) throw error
+        
         setPbLikes(prev => prev + 1); 
         setIsPbLiked(true)
         if (photobook?.user_id) sendNotification('like_pb', photobook.user_id, id)
       }
-    } catch (err) { console.error(err) }
+    } catch (err: any) { 
+      console.error('Erro detalhado no like do photobook:', err.message || err.details || err)
+      toast(`Erro: ${err.message || 'Não foi possível curtir o álbum.'}`, 'error')
+    }
   }
 
   const handleMomentLike = async (groupId: string) => {
     if (!supabase || !currentUser) return router.push('/login')
     const group = photoGroups.find(g => g.id === groupId)
     if (!group) return
-    if (group.isLiked) {
-      await supabase.from('photo_likes').delete().eq('photo_id', groupId).eq('user_id', currentUser.id)
-      setPhotoGroups(prev => prev.map(g => g.id === groupId ? { ...g, isLiked: false, likes: Math.max(0, g.likes - 1) } : g))
-    } else {
-      await supabase.from('photo_likes').insert({ photo_id: groupId, user_id: currentUser.id })
-      setPhotoGroups(prev => prev.map(g => g.id === groupId ? { ...g, isLiked: true, likes: g.likes + 1 } : g))
+
+    try {
+      if (group.isLiked) {
+        const { error } = await supabase
+          .from('photo_likes')
+          .delete()
+          .eq('photo_id', groupId)
+          .eq('user_id', currentUser.id)
+        
+        if (error) throw error
+        
+        setPhotoGroups(prev => prev.map(g => g.id === groupId ? { ...g, isLiked: false, likes: Math.max(0, g.likes - 1) } : g))
+      } else {
+        const { error } = await supabase
+          .from('photo_likes')
+          .insert({ photo_id: groupId, user_id: currentUser.id })
+        
+        if (error) throw error
+        
+        setPhotoGroups(prev => prev.map(g => g.id === groupId ? { ...g, isLiked: true, likes: g.likes + 1 } : g))
+      }
+    } catch (err: any) { 
+      console.error('Erro detalhado ao processar like:', err.message || err.details || err)
+      toast(`Erro: ${err.message || 'Não foi possível processar a curtida.'}`, 'error')
     }
   }
 
@@ -196,16 +214,25 @@ export default function PhotobookDetailPage() {
             <h1 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '8px', letterSpacing: '-0.5px' }}>{photobook.title}</h1>
             <div className="meta" style={{ display: 'flex', gap: '15px' }}>
               <span onClick={() => router.push(`/profile/${photobook.user_id}`)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>{photobook.users?.username}</span>
-              <span>{pbLikes} APRECIÇÕES</span>
+              <span>{pbLikes} APRECIAÇÕES</span>
             </div>
             {photobook.description && (
               <p style={{ marginTop: '15px', fontSize: '14px', lineHeight: '1.5', maxWidth: '600px', opacity: 0.8 }}>
-                {photobook.description}
+                <FormattedText text={photobook.description} />
               </p>
             )}
           </div>
 
           <div style={{ display: 'flex', gap: '10px' }}>
+            <button 
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast('Link do photobook copiado!', 'success');
+              }}
+              style={{ height: '36px', padding: '0 15px', fontSize: '11px', border: '1px solid var(--border)' }}
+            >
+              COMPARTILHAR
+            </button>
             <button onClick={handlePbLike} style={{ height: '36px', padding: '0 15px', fontSize: '11px', backgroundColor: isPbLiked ? 'transparent' : 'var(--text)', color: isPbLiked ? 'var(--text)' : 'var(--bg)' }}>
               {isPbLiked ? 'APRECIADO' : 'APRECIAR'}
             </button>
@@ -251,12 +278,21 @@ export default function PhotobookDetailPage() {
               <div style={{ padding: '0 5px', maxWidth: '600px' }}>
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '12px' }}>
                   <span className="meta">{new Date(group.createdAt).toLocaleDateString()}</span>
-                  <span onClick={() => handleMomentLike(group.id)} className="meta" style={{ cursor: 'pointer', fontWeight: 'bold' }}>
-                    {group.likes} {group.isLiked ? '♥' : '♡'}
+                  <span 
+                    onClick={() => handleMomentLike(group.id)} 
+                    className="meta" 
+                    style={{ 
+                      cursor: 'pointer', 
+                      fontWeight: 'bold',
+                      color: group.isLiked ? '#ff4d4f' : 'inherit',
+                      textDecoration: group.isLiked ? 'underline' : 'none'
+                    }}
+                  >
+                    {group.likes} {group.likes === 1 ? 'LIKE' : 'LIKES'}
                   </span>
                 </div>
                 
-                {group.description && <p style={{ fontSize: '15px', lineHeight: '1.5', marginBottom: '15px', fontWeight: '500' }}>{group.description}</p>}
+                {group.description && <p style={{ fontSize: '15px', lineHeight: '1.5', marginBottom: '15px', fontWeight: '500' }}><FormattedText text={group.description} /></p>}
 
                 {/* COMENTÁRIOS */}
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
