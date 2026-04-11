@@ -218,9 +218,9 @@ export default function PhotobookDetailPage() {
               <span>{pbLikes} APRECIAÇÕES</span>
             </div>
             {photobook.description && (
-              <p style={{ marginTop: '15px', fontSize: '14px', lineHeight: '1.5', maxWidth: '600px', opacity: 0.8 }}>
+              <div style={{ marginTop: '20px', maxWidth: '700px' }}>
                 <FormattedText text={photobook.description} />
-              </p>
+              </div>
             )}
           </div>
 
@@ -326,7 +326,11 @@ export default function PhotobookDetailPage() {
                     </span>
                   </div>
                   
-                  {group.description && <p style={{ fontSize: '15px', lineHeight: '1.6', marginBottom: '20px', fontWeight: '400', color: 'var(--text)' }}><FormattedText text={group.description} /></p>}
+                  {group.description && (
+                    <div style={{ margin: '20px 0 30px 0', maxWidth: '700px' }}>
+                      <FormattedText text={group.description} />
+                    </div>
+                  )}
 
                   {/* COMENTÁRIOS */}
                   <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
