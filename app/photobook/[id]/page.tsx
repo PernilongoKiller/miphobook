@@ -53,7 +53,7 @@ export default function PhotobookDetailPage() {
           const [commentsRes, likesRes, userLikeRes] = await Promise.all([
             supabase.from('photo_comments').select('*, users(username, avatar_url)').eq('photo_id', photo.id).order('created_at', { ascending: true }),
             supabase.from('photo_likes').select('*', { count: 'exact', head: true }).eq('photo_id', photo.id),
-            currentUser ? supabase.from('photo_likes').select('id').eq('photo_id', photo.id).eq('user_id', currentUser.id).limit(1) : Promise.resolve({ data: [] })
+            currentUser ? supabase.from('photo_likes').select('id').eq('photo_id', photo.id).eq('user_id', currentUser.id).limit(1) : Promise.resolve({ data: [], error: null } as any)
           ]);
           
           if (commentsRes.error) console.error('Comments error:', commentsRes.error);

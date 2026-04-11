@@ -99,10 +99,9 @@ export default function Home() {
               padding: '12px 0', fontSize: '11px', fontWeight: activeTab === 'explore' ? '600' : '400',
               cursor: 'pointer', color: activeTab === 'explore' ? 'var(--text)' : 'var(--muted)',
               borderBottom: activeTab === 'explore' ? '1px solid var(--text)' : 'none'
-            }}
-          >Explorar</span>
-          {user && (
-            <span 
+              }}
+              >biblioteca</span>
+              {user && (            <span 
               onClick={() => setActiveTab('following')} 
               style={{ 
                 padding: '12px 0', fontSize: '11px', fontWeight: activeTab === 'following' ? '600' : '400',

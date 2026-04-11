@@ -22,7 +22,7 @@ O Miphobook evoluiu para uma estética **Brutalista Minimalista (Estilo Are.na)*
 - **RLS**: Políticas de segurança configuradas para criação/exclusão de dados pelo dono.
 
 ## Sugestões para Amanhã (13/03/2026)
-- **Logística do Feed "Seguindo"**: Implementar a lógica real da aba "Seguindo" na Home (atualmente mostra apenas o Explorar).
+- **Logística do Feed "Seguindo"**: Implementar a lógica real da aba "Seguindo" na Home (atualmente mostra apenas o biblioteca).
 - **Busca por Photobooks**: Expandir a busca do Header para encontrar álbuns por título ou descrição, não apenas usuários.
 - **Otimização de Imagens**: Refinar o uso do Cloudinary para carregar imagens ainda mais leves e rápidas.
 - **UX de Upload**: Melhorar a barra de progresso ou feedback visual durante o envio de múltiplos "Momentos".
