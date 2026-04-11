@@ -70,27 +70,31 @@ button:hover:not(:disabled) {
 
 /* ... (meta remains unchanged) ... */
 
-/* ESTILO BOOK-CARD (LIVRO) - ESTÁTICO E CENTRALIZADO */
+/* ESTILO BOOK-CARD (LIVRO) - IDENTIDADE MIPHOBOOK */
 .book-card {
   position: relative;
-  aspect-ratio: 3/4;
+  aspect-ratio: 2/3; 
   background-color: var(--bg);
   border: 1px solid var(--border);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Sem transform ou sombras suaves para manter a simplicidade */
 }
 
-/* Simulação da Lombada sutil e estática */
+/* Lombada técnica e minimalista */
 .book-card::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
-  width: 12px;
-  background: linear-gradient(to right, rgba(0,0,0,0.05) 0%, transparent 100%);
+  width: 15px; 
+  background: linear-gradient(to right, 
+    rgba(0,0,0,0.03) 0%, 
+    transparent 100%);
+  border-right: 1px solid var(--border);
   z-index: 10;
 }
 
@@ -103,14 +107,14 @@ button:hover:not(:disabled) {
   position: relative;
   overflow: hidden;
   background-color: var(--border);
-  margin: 15px 15px 0 25px; /* Mais margem interna para as fotos */
-  border: 1px solid var(--border);
+  margin: 0;
 }
 
 .book-info {
-  padding: 15px 15px 15px 25px;
+  padding: 12px 15px 12px 25px; /* Recuo para a lombada */
   background: var(--bg);
   z-index: 5;
+  border-top: 1px solid var(--border);
 }
 
 .book-title {
@@ -118,9 +122,13 @@ button:hover:not(:disabled) {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 0 0 6px 0;
-  line-height: 1.3;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
   color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* GRID E CONTAINER CENTRALIZADO */
