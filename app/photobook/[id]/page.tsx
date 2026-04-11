@@ -269,15 +269,12 @@ export default function PhotobookDetailPage() {
                     <div 
                       key={photo.id} 
                       onClick={() => setSelectedPhoto(photo.image_url)}
-                      className="photo-card"
                       style={{ 
                         position: 'relative', 
                         border: '1px solid var(--border)', 
                         padding: '6px', 
                         backgroundColor: 'var(--bg)',
-                        cursor: 'zoom-in',
-                        transition: 'transform 0.1s ease',
-                        boxShadow: '0 0 0 transparent'
+                        cursor: 'zoom-in'
                       }}
                     >
                       <div style={{ 
@@ -383,14 +380,6 @@ export default function PhotobookDetailPage() {
         )}
 
       </main>
-
-      <style jsx>{`
-        .photo-card:hover {
-          transform: translate(-4px, -4px);
-          box-shadow: 4px 4px 0 var(--text) !important;
-          z-index: 5;
-        }
-      `}</style>
     </div>
   )
 }
