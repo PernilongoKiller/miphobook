@@ -33,6 +33,7 @@ export default function PhotobookDetailPage() {
   const [newComment, setNewComment] = useState<Record<string, string>>({})
   const [pbLikes, setPbLikes] = useState<number>(0)
   const [isPbLiked, setIsPbLiked] = useState(false)
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
 
   const fetchPhotobookDetails = useCallback(async () => {
     if (!supabase || !id) return
@@ -250,77 +251,146 @@ export default function PhotobookDetailPage() {
         </header>
 
         {/* TIMELINE */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
-          {photoGroups.map((group) => (
-            <article key={group.id} style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-              
-              <div className="responsive-grid" style={{ gap: '10px', background: 'none', border: 'none' }}>
-                {group.photos.map((photo) => (
-                  <div key={photo.id} style={{ position: 'relative', border: '1px solid var(--border)', padding: '6px', backgroundColor: 'var(--bg)' }}>
-                    <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
-                      <img 
-                        src={getOptimizedCloudinaryUrl(photo.image_url, { width: 600, height: 600, crop: 'fill' })} 
-                        alt="Moment" 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', cursor: 'pointer' }} 
-                        onClick={() => window.open(photo.image_url, '_blank')}
-                      />
-                    </div>
-                    {isOwner && (
-                      <span 
-                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id, photo.image_url); }} 
-                        style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '10px', fontWeight: '900', cursor: 'pointer', background: 'var(--text)', color: 'var(--bg)', padding: '4px 8px', zIndex: 10, border: 'none' }}
-                      >APAGAR</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ padding: '0 5px', maxWidth: '600px' }}>
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '12px' }}>
-                  <span className="meta">{new Date(group.createdAt).toLocaleDateString()}</span>
-                  <span 
-                    onClick={() => handleMomentLike(group.id)} 
-                    className="meta" 
-                    style={{ 
-                      cursor: 'pointer', 
-                      fontWeight: 'bold',
-                      color: group.isLiked ? '#ff4d4f' : 'inherit',
-                      textDecoration: group.isLiked ? 'underline' : 'none'
-                    }}
-                  >
-                    {group.likes} {group.likes === 1 ? 'LIKE' : 'LIKES'}
-                  </span>
-                </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '100px' }}>
+          {photoGroups.map((group) => {
+            const isSingle = group.photos.length === 1;
+            const isDouble = group.photos.length === 2;
+            
+            return (
+              <article key={group.id} style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
                 
-                {group.description && <p style={{ fontSize: '15px', lineHeight: '1.5', marginBottom: '15px', fontWeight: '500' }}><FormattedText text={group.description} /></p>}
-
-                {/* COMENTÁRIOS */}
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '15px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {group.comments.map((c: any) => (
-                    <div key={c.id} style={{ fontSize: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span><strong>{c.users?.username}</strong> {c.content}</span>
-                      {(currentUser?.id === c.user_id || isOwner) && (
-                        <span onClick={() => handleDeleteComment(group.id, c.id)} style={{ cursor: 'pointer', opacity: 0.5, fontSize: '10px', padding: '2px 5px' }}>APAGAR</span>
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: isSingle ? '1fr' : isDouble ? '1fr 1fr' : 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '12px',
+                  maxWidth: isSingle ? '800px' : 'none'
+                }}>
+                  {group.photos.map((photo) => (
+                    <div 
+                      key={photo.id} 
+                      onClick={() => setSelectedPhoto(photo.image_url)}
+                      className="photo-card"
+                      style={{ 
+                        position: 'relative', 
+                        border: '1px solid var(--border)', 
+                        padding: '6px', 
+                        backgroundColor: 'var(--bg)',
+                        cursor: 'zoom-in',
+                        transition: 'transform 0.1s ease',
+                        boxShadow: '0 0 0 transparent'
+                      }}
+                    >
+                      <div style={{ 
+                        aspectRatio: isSingle ? 'auto' : '1/1', 
+                        overflow: 'hidden',
+                        maxHeight: isSingle ? '70vh' : 'none'
+                      }}>
+                        <img 
+                          src={isSingle 
+                            ? getOptimizedCloudinaryUrl(photo.image_url, { width: 1200 }) 
+                            : getOptimizedCloudinaryUrl(photo.image_url, { width: 800, height: 800, crop: 'fill' })
+                          } 
+                          alt="Moment" 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: isSingle ? 'contain' : 'cover', 
+                            display: 'block' 
+                          }} 
+                        />
+                      </div>
+                      {isOwner && (
+                        <span 
+                          onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo.id, photo.image_url); }} 
+                          style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '9px', fontWeight: '900', cursor: 'pointer', background: 'var(--text)', color: 'var(--bg)', padding: '4px 8px', zIndex: 10 }}
+                        >APAGAR</span>
                       )}
                     </div>
                   ))}
-                  
-                  {currentUser && (
-                    <input 
-                      type="text" 
-                      placeholder="+ comentar" 
-                      value={newComment[group.id] || ''} 
-                      onChange={(e) => setNewComment(prev => ({ ...prev, [group.id]: e.target.value }))}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAddComment(group.id)}
-                      style={{ border: 'none', borderBottom: '1px solid var(--border)', padding: '5px 0', fontSize: '12px', outline: 'none', width: '150px', backgroundColor: 'transparent' }}
-                    />
-                  )}
                 </div>
-              </div>
-            </article>
-          ))}
+
+                <div style={{ padding: '0 5px', maxWidth: '600px' }}>
+                  <div style={{ display: 'flex', gap: '15px', alignItems: 'center', marginBottom: '15px' }}>
+                    <span className="meta" style={{ fontSize: '11px', opacity: 0.6 }}>{new Date(group.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}</span>
+                    <span 
+                      onClick={() => handleMomentLike(group.id)} 
+                      className="meta" 
+                      style={{ 
+                        cursor: 'pointer', 
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        color: group.isLiked ? 'var(--text)' : 'var(--muted)',
+                        textDecoration: group.isLiked ? 'underline' : 'none',
+                        border: group.isLiked ? 'none' : '1px solid var(--border)',
+                        padding: group.isLiked ? '0' : '2px 8px'
+                      }}
+                    >
+                      {group.likes} {group.likes === 1 ? 'LIKE' : 'LIKES'}
+                    </span>
+                  </div>
+                  
+                  {group.description && <p style={{ fontSize: '15px', lineHeight: '1.6', marginBottom: '20px', fontWeight: '400', color: 'var(--text)' }}><FormattedText text={group.description} /></p>}
+
+                  {/* COMENTÁRIOS */}
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {group.comments.map((c: any) => (
+                      <div key={c.id} style={{ fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <span style={{ lineHeight: '1.4' }}><strong style={{ fontWeight: '600', marginRight: '8px' }}>{c.users?.username}</strong> {c.content}</span>
+                        {(currentUser?.id === c.user_id || isOwner) && (
+                          <span onClick={() => handleDeleteComment(group.id, c.id)} style={{ cursor: 'pointer', opacity: 0.4, fontSize: '10px', padding: '2px 5px', marginLeft: '10px' }}>APAGAR</span>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {currentUser && (
+                      <input 
+                        type="text" 
+                        placeholder="Adicionar comentário..." 
+                        value={newComment[group.id] || ''} 
+                        onChange={(e) => setNewComment(prev => ({ ...prev, [group.id]: e.target.value }))}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddComment(group.id)}
+                        style={{ border: 'none', borderBottom: '1px solid var(--border)', padding: '8px 0', fontSize: '13px', outline: 'none', width: '100%', maxWidth: '300px', backgroundColor: 'transparent', marginTop: '10px' }}
+                      />
+                    )}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
+
+        {/* LIGHTBOX MODAL */}
+        {selectedPhoto && (
+          <div 
+            onClick={() => setSelectedPhoto(null)}
+            style={{ 
+              position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
+              backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 1000, 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'zoom-out', padding: '40px'
+            }}
+          >
+            <img 
+              src={getOptimizedCloudinaryUrl(selectedPhoto, { width: 1600 })} 
+              alt="Full size" 
+              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', border: '1px solid #333' }}
+            />
+            <button 
+              style={{ position: 'absolute', top: '20px', right: '20px', background: 'white', color: 'black', border: 'none', padding: '8px 15px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+              onClick={() => setSelectedPhoto(null)}
+            >FECHAR</button>
+          </div>
+        )}
+
       </main>
+
+      <style jsx>{`
+        .photo-card:hover {
+          transform: translate(-4px, -4px);
+          box-shadow: 4px 4px 0 var(--text) !important;
+          z-index: 5;
+        }
+      `}</style>
     </div>
   )
 }
