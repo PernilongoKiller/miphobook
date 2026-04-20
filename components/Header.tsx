@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useTheme } from '@/lib/ThemeProvider'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 import Skeleton from '@/components/Skeleton'
 
 export default function Header() {
@@ -111,10 +111,10 @@ export default function Header() {
               onChange={(e) => setSearchQuery(e.target.value)} 
               style={{ 
                 width: '100%', 
-                padding: '6px 0',
-                backgroundColor: 'transparent', 
+                padding: '10px 16px',
+                backgroundColor: 'rgba(0,0,0,0.05)', 
                 border: 'none', 
-                borderBottom: '1px solid var(--border)',
+                borderRadius: '20px',
                 color: 'var(--text)', 
                 fontSize: '13px', 
                 outline: 'none' 
@@ -123,31 +123,34 @@ export default function Header() {
             {showResults && (
               <div style={{ 
                 position: 'absolute', 
-                top: '100%', 
+                top: 'calc(100% + 8px)', 
                 left: 0, 
                 right: 0, 
                 backgroundColor: 'var(--bg)', 
                 border: '1px solid var(--border)', 
+                borderRadius: 'var(--radius)',
                 zIndex: 1000, 
-                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                overflow: 'hidden'
               }}>
                 {searchResults.map(item => (
                   <div 
                     key={item.id + item.type} 
                     onClick={() => { router.push(item.type === 'user' ? `/profile/${item.id}` : `/photobook/${item.id}`); setShowResults(false); setSearchQuery(''); }} 
-                    style={{ padding: '10px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}
+                    style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '10px' }}
                   >
-                    <div style={{ width: '24px', height: '24px', border: '1px solid var(--border)', flexShrink: 0, overflow: 'hidden' }}>
-                      {item.type === 'user' ? (
-                        item.avatar_url ? <img src={getOptimizedCloudinaryUrl(item.avatar_url, { width: 48, height: 48, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ backgroundColor: 'var(--border)', height: '100%' }} />
-                      ) : (
-                        <div style={{ backgroundColor: 'var(--text)', height: '100%', opacity: 0.1 }} />
-                      )}
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--border)', flexShrink: 0, overflow: 'hidden', backgroundColor: 'var(--border)' }}>
+                      <img 
+                        src={item.avatar_url ? getOptimizedCloudinaryUrl(item.avatar_url, { width: 56, height: 56 }) : DEFAULT_AVATAR} 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        loading="lazy"
+                        alt=""
+                      />
                     </div>
-                    <div style={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <div style={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: '500' }}>
                       {item.type === 'user' ? item.username : item.title}
                     </div>
-                    <span style={{ fontSize: '9px', opacity: 0.5 }}>{item.type === 'user' ? 'membro' : 'álbum'}</span>
+                    <span style={{ fontSize: '9px', opacity: 0.5, textTransform: 'uppercase' }}>{item.type === 'user' ? 'membro' : 'álbum'}</span>
                   </div>
                 ))}
               </div>
@@ -156,6 +159,8 @@ export default function Header() {
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button className="hide-on-mobile" onClick={() => router.push('/about')} style={{ ...iconButtonStyle, fontSize: '10px', fontWeight: 'bold' }}>SOBRE</button>
+          
           {loading ? <Skeleton width="40px" height="20px" /> : userId ? (
             <>
               <div className="hide-on-mobile" style={{ display: 'flex', gap: '8px' }}>
@@ -178,10 +183,32 @@ export default function Header() {
                   {unreadCount > 0 && <span style={{ position: 'absolute', top: '6px', right: '6px', width: '6px', height: '6px', backgroundColor: 'red', borderRadius: '50%' }}></span>}
                 </button>
                 {showNotifications && (
-                  <div style={{ position: 'absolute', top: '130%', right: 0, width: '260px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', zIndex: 1000, padding: '10px' }}>
-                    {notifications.length === 0 ? <p style={{ fontSize: '11px', textAlign: 'center' }}>Sem avisos.</p> : notifications.map(n => (
-                      <div key={n.id} onClick={() => { setShowNotifications(false); router.push(n.type === 'follow' ? `/profile/${n.actor_id}` : `/photobook/${n.entity_id}`); }} style={{ padding: '8px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '11px' }}>
-                        <strong>{n.actor?.username}</strong> {n.type === 'like_pb' ? 'apreciou seu álbum' : 'interagiu'}
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: 'calc(100% + 15px)', 
+                    right: 0, 
+                    width: '300px', 
+                    backgroundColor: 'var(--bg)', 
+                    border: '1px solid var(--border)', 
+                    borderRadius: 'var(--radius)',
+                    zIndex: 1000, 
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    padding: '8px 0',
+                    overflow: 'hidden'
+                  }}>
+                    {notifications.length === 0 ? <p style={{ fontSize: '13px', padding: '20px', textAlign: 'center', color: 'var(--muted)' }}>Sem avisos.</p> : notifications.map(n => (
+                      <div key={n.id} onClick={() => { setShowNotifications(false); router.push(n.type === 'follow' ? `/profile/${n.actor_id}` : `/photobook/${n.entity_id}`); }} style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', overflow: 'hidden', backgroundColor: 'var(--border)', flexShrink: 0 }}>
+                           <img 
+                             src={n.actor?.avatar_url ? getOptimizedCloudinaryUrl(n.actor.avatar_url, { width: 64, height: 64 }) : DEFAULT_AVATAR} 
+                             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                             loading="lazy"
+                             alt=""
+                           />
+                        </div>
+                        <div style={{ flexGrow: 1 }}>
+                          <strong>{n.actor?.username}</strong> {n.type === 'like_pb' ? 'apreciou seu álbum' : 'interagiu'}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -217,13 +244,15 @@ export default function Header() {
               onClick={() => { router.push(item.type === 'user' ? `/profile/${item.id}` : `/photobook/${item.id}`); setIsMobileSearchOpen(false); setSearchQuery(''); }} 
               style={{ padding: '15px 0', borderBottom: '1px solid var(--border)', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '15px' }}
             >
-              <div style={{ width: '32px', height: '32px', border: '1px solid var(--border)', flexShrink: 0, overflow: 'hidden' }}>
-                {item.type === 'user' ? (
-                  item.avatar_url ? <img src={getOptimizedCloudinaryUrl(item.avatar_url, { width: 64, height: 64, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ backgroundColor: 'var(--border)', height: '100%' }} />
-                ) : (
-                  <div style={{ backgroundColor: 'var(--text)', height: '100%', opacity: 0.1 }} />
-                )}
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', border: '1px solid var(--border)', flexShrink: 0, overflow: 'hidden', backgroundColor: 'var(--border)' }}>
+                <img 
+                  src={item.avatar_url ? getOptimizedCloudinaryUrl(item.avatar_url, { width: 56, height: 56 }) : DEFAULT_AVATAR} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  loading="lazy"
+                  alt=""
+                />
               </div>
+
               <div style={{ flexGrow: 1 }}>
                 {item.type === 'user' ? item.username : item.title}
                 <div className="meta" style={{ fontSize: '10px', marginTop: '2px' }}>{item.type === 'user' ? 'Membro' : 'Álbum'}</div>

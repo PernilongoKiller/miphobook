@@ -27,14 +27,12 @@ export default function Home() {
     setLoading(true)
     
     try {
-      // 1. Buscar Posts
       const { data: postsData } = await supabase
         .from('posts')
         .select('*, users(username, avatar_url)')
         .order('created_at', { ascending: false })
         .limit(20)
 
-      // 2. Buscar Momentos (Fotos recentes de álbuns públicos)
       const { data: photosData } = await supabase
         .from('photos')
         .select(`
@@ -47,7 +45,6 @@ export default function Home() {
         .order('created_at', { ascending: false })
         .limit(20)
 
-      // Agrupar fotos em momentos (lógica existente)
       const momentGroups: any[] = [];
       let currentGroup: any = null;
 
@@ -61,7 +58,6 @@ export default function Home() {
         }
       }
 
-      // 3. Misturar e Ordenar
       const combined = [
         ...(postsData || []).map(p => ({ ...p, type: 'post' })),
         ...momentGroups
@@ -78,10 +74,8 @@ export default function Home() {
   const fetchFollowedMoments = useCallback(async (currentId: string) => {
     if (!supabase) return
     setLoading(true)
-    
     try {
-      // ... (Lógica de busca Seguindo existente, mas vamos unificar para aceitar posts e momentos)
-      // Por brevidade, vamos focar no global primeiro, mas a lógica seria similar
+      // Lógica de busca seguindo...
       setLoading(false)
     } catch (err) { setLoading(false) }
   }, [supabase])
@@ -162,15 +156,19 @@ export default function Home() {
           ) : activeTab === 'explore' ? (
             <div className="responsive-grid">
               {photobooks.map((pb) => {
-                const cover = pb.photos?.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())?.[0]?.image_url;
+                const photos = pb.photos || [];
+                const cover = photos.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())?.[0]?.image_url;
+                
                 return (
                   <div key={pb.id} className="book-card" onClick={() => router.push(`/photobook/${pb.id}`)}>
                     <div className="book-cover">
                       <div className="book-cover-photo-wrapper">
                         {cover ? (
                           <img 
-                            src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400, crop: 'fill' })} 
+                            src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400 })} 
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                            loading="lazy"
+                            alt={pb.title}
                           />
                         ) : (
                           <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -192,7 +190,7 @@ export default function Home() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {feedItems.length > 0 ? (
-                feedItems.map(item => (
+                feedItems.map((item, index) => (
                   item.type === 'post' ? (
                     <PostCard key={item.id} post={item} />
                   ) : (

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 import FormattedText from '@/components/FormattedText'
 
 interface PostCardProps {
@@ -56,13 +56,14 @@ export default function PostCard({ post }: PostCardProps) {
       <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div 
           onClick={() => router.push(`/profile/${post.user_id}`)}
-          style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden', border: '1px solid var(--border)' }}
+          style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden', border: '1px solid var(--border)', backgroundColor: 'var(--border)' }}
         >
-          {post.users?.avatar_url ? (
-            <img src={getOptimizedCloudinaryUrl(post.users.avatar_url, { width: 64, height: 64, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ width: '100%', height: '100%', backgroundColor: 'var(--border)' }} />
-          )}
+          <img 
+            src={post.users?.avatar_url ? getOptimizedCloudinaryUrl(post.users.avatar_url, { width: 64, height: 64 }) : DEFAULT_AVATAR} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            loading="lazy"
+            alt={post.users?.username}
+          />
         </div>
         <div>
           <span 
@@ -84,18 +85,18 @@ export default function PostCard({ post }: PostCardProps) {
       {post.image_url && (
         <div 
           style={{ 
-            width: '100%', 
-            maxHeight: '500px', 
-            overflow: 'hidden', 
-            backgroundColor: 'var(--border)',
+            padding: '0 16px 16px 16px',
             cursor: 'pointer'
           }}
           onClick={() => {/* Lógica de zoom opcional */}}
         >
-          <img 
-            src={getOptimizedCloudinaryUrl(post.image_url, { width: 800 })} 
-            style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} 
-          />
+          <div style={{ width: '100%', maxHeight: '500px', overflow: 'hidden', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+            <img 
+              src={getOptimizedCloudinaryUrl(post.image_url, { width: 800, quality: '80' })} 
+              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} 
+              loading="lazy"
+            />
+          </div>
         </div>
       )}
 

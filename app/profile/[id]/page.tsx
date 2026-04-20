@@ -8,7 +8,7 @@ import Skeleton from '@/components/Skeleton'
 import PostCard from '@/components/PostCard'
 import MomentCard from '@/components/MomentCard'
 import FormattedText from '@/components/FormattedText'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
 export default function UserProfilePage() {
   const router = useRouter()
@@ -40,7 +40,6 @@ export default function UserProfilePage() {
   }, [supabase, id])
 
   const fetchMoments = useCallback(async () => {
-    // ... (lógica existente mantida)
     if (!supabase || !id) return
     try {
       const { data: photosData } = await supabase
@@ -171,18 +170,20 @@ export default function UserProfilePage() {
       <main className="main-container">
         
         {/* Banner Noir */}
-        <div className="card-border" style={{ 
+        <div style={{ 
           width: '100%', 
           height: '200px', 
           backgroundColor: 'var(--border)', 
           overflow: 'hidden', 
-          marginBottom: '20px',
-          borderWidth: '2px'
+          marginBottom: '25px',
+          borderRadius: 'var(--radius)',
+          border: '1px solid var(--border)'
         }}>
           {profile.banner_url && (
             <img 
-              src={getOptimizedCloudinaryUrl(profile.banner_url, { width: 1200 })} 
+              src={getOptimizedCloudinaryUrl(profile.banner_url, { width: 1200, quality: '80' })} 
               style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              loading="lazy"
             />
           )}
         </div>
@@ -191,15 +192,27 @@ export default function UserProfilePage() {
         <div style={{ paddingBottom: '40px', marginBottom: '40px' }}>
           <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             
-            {/* Avatar Quadrado Are.na */}
-            <div className="card-border" style={{ width: '100px', height: '100px', backgroundColor: 'var(--bg)', flexShrink: 0, borderWidth: '2px' }}>
-              {profile.avatar_url ? (
-                <img src={getOptimizedCloudinaryUrl(profile.avatar_url, { width: 200, height: 200, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '40px' }}>person</span>
-                </div>
-              )}
+            {/* Avatar Arredondado */}
+            <div style={{ 
+              width: '120px', 
+              height: '120px', 
+              backgroundColor: 'var(--card-bg)', 
+              flexShrink: 0, 
+              borderRadius: '50%', 
+              border: '4px solid var(--card-bg)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              overflow: 'hidden',
+              marginTop: '-60px',
+              marginLeft: '20px',
+              position: 'relative',
+              zIndex: 5
+            }}>
+              <img 
+                src={profile.avatar_url ? getOptimizedCloudinaryUrl(profile.avatar_url, { width: 240, height: 240 }) : DEFAULT_AVATAR} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                loading="lazy"
+                alt="Avatar"
+              />
             </div>
 
             <div style={{ flexGrow: 1, minWidth: '250px' }}>
@@ -228,7 +241,6 @@ export default function UserProfilePage() {
                 </p>
               )}
 
-              {/* Links Pessoais Minimalistas */}
               {profile.links && profile.links.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
                   {profile.links.map((link: any, i: number) => (
@@ -293,7 +305,7 @@ export default function UserProfilePage() {
                   <div className="book-cover">
                     <div className="book-cover-photo-wrapper">
                       {cover ? (
-                        <img src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400 })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
                       ) : (
                         <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>

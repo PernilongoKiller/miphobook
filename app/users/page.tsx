@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import Header from '@/components/Header'
 import Skeleton from '@/components/Skeleton'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
 export default function UsersPage() {
   const router = useRouter()
@@ -74,14 +74,13 @@ export default function UsersPage() {
                 transition: 'transform 0.2s ease'
               }}
             >
-              <div style={{ width: '50px', height: '50px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
-                {u.avatar_url ? (
-                  <img src={getOptimizedCloudinaryUrl(u.avatar_url, { width: 100, height: 100, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', backgroundColor: 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--muted)' }}>person</span>
-                  </div>
-                )}
+              <div style={{ width: '50px', height: '50px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0, backgroundColor: 'var(--border)' }}>
+                <img 
+                  src={u.avatar_url ? getOptimizedCloudinaryUrl(u.avatar_url, { width: 100, height: 100 }) : DEFAULT_AVATAR} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  loading="lazy"
+                  alt={u.username}
+                />
               </div>
               <div style={{ flexGrow: 1, overflow: 'hidden' }}>
                 <h3 style={{ fontSize: '15px', fontWeight: '700', margin: 0 }}>{u.username}</h3>

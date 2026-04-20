@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 import FormattedText from '@/components/FormattedText'
 
 interface MomentCardProps {
@@ -61,8 +61,6 @@ export default function MomentCard({ moment }: MomentCardProps) {
         if (error) throw error
         setIsLiked(true)
         setLikesCount(prev => prev + 1)
-        
-        // Notificação opcional aqui
       }
     } catch (err: any) {
       toast('Erro ao processar curtida.', 'error')
@@ -82,14 +80,16 @@ export default function MomentCard({ moment }: MomentCardProps) {
             width: '38px', height: '38px', 
             borderRadius: '50%', 
             cursor: 'pointer', overflow: 'hidden',
-            border: '1px solid var(--border)' 
+            border: '1px solid var(--border)',
+            backgroundColor: 'var(--border)'
           }}
         >
-          {moment.photobooks?.users.avatar_url ? (
-            <img src={getOptimizedCloudinaryUrl(moment.photobooks.users.avatar_url, { width: 80, height: 80, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ width: '100%', height: '100%', backgroundColor: 'var(--border)' }} />
-          )}
+          <img 
+            src={moment.photobooks?.users.avatar_url ? getOptimizedCloudinaryUrl(moment.photobooks.users.avatar_url, { width: 80, height: 80 }) : DEFAULT_AVATAR} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            loading="lazy"
+            alt={moment.photobooks?.users.username}
+          />
         </div>
         <div style={{ flexGrow: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -117,8 +117,9 @@ export default function MomentCard({ moment }: MomentCardProps) {
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: isSingle ? '1fr' : isDouble ? '1fr 1fr' : 'repeat(auto-fill, minmax(200px, 1fr))',
-        gap: '2px',
-        backgroundColor: 'var(--border)'
+        gap: '4px',
+        backgroundColor: 'transparent',
+        padding: '0 16px'
       }}>
         {moment.photos.map((photo) => (
           <div 
@@ -128,13 +129,16 @@ export default function MomentCard({ moment }: MomentCardProps) {
               aspectRatio: isSingle ? 'auto' : '1/1', 
               backgroundColor: 'var(--card-bg)',
               cursor: 'pointer',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)'
             }}
           >
             <img 
-              src={getOptimizedCloudinaryUrl(photo.image_url, { width: 800 })} 
+              src={getOptimizedCloudinaryUrl(photo.image_url, { width: 600, quality: '80' })} 
               alt="Moment" 
               style={{ width: '100%', height: '100%', objectFit: isSingle ? 'contain' : 'cover', display: 'block' }} 
+              loading="lazy"
             />
           </div>
         ))}
@@ -153,7 +157,7 @@ export default function MomentCard({ moment }: MomentCardProps) {
             }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '26px', fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}>
-              {isLiked ? 'favorite' : 'favorite'}
+              favorite
             </span>
           </button>
 

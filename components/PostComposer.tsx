@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
 export default function PostComposer({ onPostCreated }: { onPostCreated: () => void }) {
   const supabase = useSupabase()
@@ -23,7 +23,7 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
     setIsUploading(true)
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('upload_preset', 'ml_default') // Certifique-se de que este preset está configurado no seu Cloudinary
+    formData.append('upload_preset', 'ml_default')
 
     try {
       const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
@@ -68,12 +68,12 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
   return (
     <div className="social-card" style={{ padding: '16px', marginBottom: '24px' }}>
       <div style={{ display: 'flex', gap: '12px' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0 }}>
-          {user.user_metadata?.avatar_url ? (
-            <img src={getOptimizedCloudinaryUrl(user.user_metadata.avatar_url, { width: 80, height: 80, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ width: '100%', height: '100%', backgroundColor: 'var(--border)' }} />
-          )}
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0, backgroundColor: 'var(--border)' }}>
+          <img 
+            src={user.user_metadata?.avatar_url ? getOptimizedCloudinaryUrl(user.user_metadata.avatar_url, { width: 80, height: 80 }) : DEFAULT_AVATAR} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            alt="Me"
+          />
         </div>
         <div style={{ flexGrow: 1 }}>
           <textarea 
@@ -84,7 +84,9 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
               width: '100%', 
               minHeight: '80px', 
               border: 'none', 
-              backgroundColor: 'transparent', 
+              backgroundColor: 'rgba(0,0,0,0.03)', 
+              borderRadius: 'var(--radius-sm)',
+              padding: '12px',
               color: 'var(--text)', 
               fontSize: '15px', 
               outline: 'none',
@@ -94,8 +96,8 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
           />
           
           {image && (
-            <div style={{ position: 'relative', marginTop: '10px', width: 'fit-content' }}>
-              <img src={getOptimizedCloudinaryUrl(image, { width: 400 })} style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '4px', border: '1px solid var(--border)' }} />
+            <div style={{ position: 'relative', marginTop: '15px', width: 'fit-content' }}>
+              <img src={getOptimizedCloudinaryUrl(image, { width: 400 })} style={{ maxWidth: '100%', maxHeight: '250px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', objectFit: 'cover' }} />
               <button 
                 onClick={() => setImage(null)}
                 style={{ 
