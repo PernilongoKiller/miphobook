@@ -166,12 +166,23 @@ export default function Home() {
                 return (
                   <div key={pb.id} className="book-card" onClick={() => router.push(`/photobook/${pb.id}`)}>
                     <div className="book-cover">
-                      {cover ? <img src={getOptimizedCloudinaryUrl(cover, { width: 400, height: 600, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : <div style={{ height: '100%', backgroundColor: 'var(--border)' }} />}
+                      <div className="book-cover-photo-wrapper">
+                        {cover ? (
+                          <img 
+                            src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400, crop: 'fill' })} 
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                          />
+                        ) : (
+                          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="book-info">
                       <h4 className="book-title">{pb.title}</h4>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--muted)' }}>{pb.users?.username}</span>
+                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: '600' }}>{pb.users?.username}</span>
                       </div>
                     </div>
                   </div>

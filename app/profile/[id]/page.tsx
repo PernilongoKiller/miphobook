@@ -3,7 +3,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
+import Header from '@/components/Header'
+import Skeleton from '@/components/Skeleton'
 import PostCard from '@/components/PostCard'
+import MomentCard from '@/components/MomentCard'
+import FormattedText from '@/components/FormattedText'
 import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
 
 export default function UserProfilePage() {
@@ -283,22 +287,23 @@ export default function UserProfilePage() {
               return (
                 <div 
                   key={pb.id} 
-                  className="card-border" 
+                  className="book-card" 
                   onClick={() => router.push(`/photobook/${pb.id}`)}
-                  style={{ position: 'relative', display: 'flex', flexDirection: 'column', cursor: 'pointer', overflow: 'hidden' }}
                 >
-                  <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
-                    {cover ? (
-                      <img src={getOptimizedCloudinaryUrl(cover, { width: 500, height: 500, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
-                      </div>
-                    )}
+                  <div className="book-cover">
+                    <div className="book-cover-photo-wrapper">
+                      {cover ? (
+                        <img src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ padding: '12px', borderTop: '2px solid var(--border)' }}>
-                    <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', lineHeight: '1.1' }}>{pb.title}</h4>
-                    <span className="meta" style={{ marginTop: '4px', fontSize: '9px', opacity: 0.7 }}>{pb.photos?.length || 0} fotos</span>
+                  <div className="book-info">
+                    <h4 className="book-title">{pb.title}</h4>
+                    <span style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: '600' }}>{pb.photos?.length || 0} FOTOS</span>
                   </div>
                 </div>
               )
