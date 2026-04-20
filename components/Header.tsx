@@ -158,9 +158,12 @@ export default function Header() {
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {loading ? <Skeleton width="40px" height="20px" /> : userId ? (
             <>
-              <div className="hide-on-mobile" style={{ display: 'flex', gap: '4px' }}>
+              <div className="hide-on-mobile" style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={() => router.push('/')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span>
+                </button>
+                <button onClick={() => router.push('/users')} style={iconButtonStyle}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>group</span>
                 </button>
                 <button onClick={() => router.push('/create-photobook')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span>

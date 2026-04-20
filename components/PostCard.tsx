@@ -100,20 +100,25 @@ export default function PostCard({ post }: PostCardProps) {
       )}
 
       <div style={{ padding: '12px 16px', borderTop: post.image_url ? 'none' : '1px solid var(--border)' }}>
-        <button 
-          onClick={handleLike}
-          style={{ 
-            border: 'none', padding: '0', background: 'none', 
-            display: 'flex', alignItems: 'center', gap: '6px',
-            color: isLiked ? '#ed4956' : 'var(--text)',
-            cursor: 'pointer'
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '22px', fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}>
-            favorite
-          </span>
-          <span style={{ fontSize: '13px', fontWeight: '600' }}>{likesCount}</span>
-        </button>
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '8px' }}>
+          <button 
+            onClick={handleLike}
+            style={{ 
+              border: 'none', padding: '0', background: 'none', 
+              display: 'flex', alignItems: 'center', gap: '6px',
+              color: isLiked ? '#ed4956' : 'var(--text)',
+              cursor: 'pointer'
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '26px', fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}>
+              favorite
+            </span>
+          </button>
+        </div>
+
+        <div style={{ fontWeight: '700', fontSize: '14px' }}>
+          {likesCount} {likesCount === 1 ? 'curtida' : 'curtidas'}
+        </div>
       </div>
     </article>
   )
