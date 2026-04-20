@@ -3,9 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
-import Header from '@/components/Header'
-import Skeleton from '@/components/Skeleton'
-import FormattedText from '@/components/FormattedText'
+import PostCard from '@/components/PostCard'
 import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
 
 export default function UserProfilePage() {
@@ -16,11 +14,64 @@ export default function UserProfilePage() {
   
   const [profile, setProfile] = useState<any>(null)
   const [photobooks, setPhotobooks] = useState<any[]>([])
+  const [moments, setMoments] = useState<any[]>([])
+  const [posts, setPosts] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'books' | 'moments' | 'posts'>('books')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const [social, setSocial] = useState({ isFollowing: false, followers: 0, following: 0 })
   const [followLoading, setFollowLoading] = useState(false)
+
+  const fetchPosts = useCallback(async () => {
+    if (!supabase || !id) return
+    try {
+      const { data } = await supabase
+        .from('posts')
+        .select('*, users(username, avatar_url)')
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+      setPosts(data || [])
+    } catch (err) { console.error(err) }
+  }, [supabase, id])
+
+  const fetchMoments = useCallback(async () => {
+    // ... (lógica existente mantida)
+    if (!supabase || !id) return
+    try {
+      const { data: photosData } = await supabase
+        .from('photos')
+        .select(`
+          *,
+          photobooks (
+            id, title,
+            users (id, username, avatar_url)
+          )
+        `)
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+        .limit(30)
+
+      const groups: any[] = [];
+      let currentGroup: any = null;
+
+      for (const photo of photosData || []) {
+        const photoTime = new Date(photo.created_at).getTime();
+        if (!currentGroup || currentGroup.photobook_id !== photo.photobook_id || currentGroup.description !== photo.description || Math.abs(photoTime - new Date(currentGroup.created_at).getTime()) > 5000) {
+          const [likesRes, userLikeRes, commentsRes] = await Promise.all([
+            supabase.from('photo_likes').select('id', { count: 'exact', head: true }).eq('photo_id', photo.id),
+            currentUser ? supabase.from('photo_likes').select('id').eq('photo_id', photo.id).eq('user_id', currentUser.id).limit(1) : Promise.resolve({ data: [] }),
+            supabase.from('photo_comments').select('id', { count: 'exact', head: true }).eq('photo_id', photo.id)
+          ])
+          currentGroup = { ...photo, photos: [photo], likes_count: likesRes.count || 0, is_liked: !!(userLikeRes.data && userLikeRes.data.length > 0), comments_count: commentsRes.count || 0 };
+          groups.push(currentGroup);
+        } else {
+          currentGroup.photos.push(photo);
+        }
+      }
+      setMoments(groups)
+    } catch (err) { console.error(err) }
+  }, [supabase, id, currentUser])
 
   const fetchData = useCallback(async () => {
     if (!supabase || !id || id === 'null' || id === 'undefined') return
@@ -53,13 +104,15 @@ export default function UserProfilePage() {
         isFollowing: (isFollowingRes.status === 'fulfilled' ? !!isFollowingRes.value.data : false)
       })
 
+      fetchMoments()
+      fetchPosts()
     } catch (err: any) {
       console.error("Erro no Perfil:", err)
       setError("Erro ao carregar dados.")
     } finally {
       setLoading(false)
     }
-  }, [supabase, id, currentUser])
+  }, [supabase, id, currentUser, fetchMoments, fetchPosts])
 
   useEffect(() => {
     fetchData()
@@ -131,7 +184,7 @@ export default function UserProfilePage() {
         </div>
 
         {/* Informações do Perfil */}
-        <div style={{ borderBottom: '2px solid var(--border)', paddingBottom: '40px', marginBottom: '40px' }}>
+        <div style={{ paddingBottom: '40px', marginBottom: '40px' }}>
           <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             
             {/* Avatar Quadrado Are.na */}
@@ -151,7 +204,8 @@ export default function UserProfilePage() {
                 <div style={{ display: 'flex', gap: '10px' }}>
                   {isOwner ? (
                     <button onClick={() => router.push(`/profile/${id}/edit`)} style={{ height: '32px', fontSize: '10px' }}>EDITAR PERFIL</button>
-                  ) : (                    <button onClick={handleFollow} disabled={followLoading} style={{ height: '32px', fontSize: '10px', backgroundColor: social.isFollowing ? 'transparent' : 'var(--text)', color: social.isFollowing ? 'var(--text)' : 'var(--bg)' }}>
+                  ) : (
+                    <button onClick={handleFollow} disabled={followLoading} style={{ height: '32px', fontSize: '10px', backgroundColor: social.isFollowing ? 'transparent' : 'var(--text)', color: social.isFollowing ? 'var(--text)' : 'var(--bg)' }}>
                       {social.isFollowing ? 'SEGUINDO' : 'SEGUIR'}
                     </button>
                   )}
@@ -184,38 +238,95 @@ export default function UserProfilePage() {
           </div>
         </div>
 
-        {/* Grade de Álbuns */}
-        <div className="responsive-grid">
-          {photobooks.map((pb) => {
-            const cover = pb.photos?.[0]?.image_url;
-            return (
-              <div 
-                key={pb.id} 
-                className="card-border" 
-                onClick={() => router.push(`/photobook/${pb.id}`)}
-                style={{ position: 'relative', display: 'flex', flexDirection: 'column', cursor: 'pointer', overflow: 'hidden' }}
-              >
-                <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
-                  {cover ? (
-                    <img src={getOptimizedCloudinaryUrl(cover, { width: 500, height: 500, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
-                    </div>
-                  )}
-                </div>
-                <div style={{ padding: '12px', borderTop: '2px solid var(--border)' }}>
-                  <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', lineHeight: '1.1' }}>{pb.title}</h4>
-                  <span className="meta" style={{ marginTop: '4px', fontSize: '9px', opacity: 0.7 }}>{pb.photos?.length || 0} fotos</span>
-                </div>
-              </div>
-            )
-          })}
+        {/* ABAS */}
+        <div style={{ display: 'flex', gap: '30px', borderBottom: '2px solid var(--border)', marginBottom: '30px' }}>
+          <button 
+            onClick={() => setActiveTab('books')}
+            style={{ 
+              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
+              color: activeTab === 'books' ? 'var(--text)' : 'var(--muted)',
+              borderBottom: activeTab === 'books' ? '2px solid var(--text)' : 'none',
+              borderRadius: 0, fontSize: '11px', fontWeight: '800'
+            }}
+          >
+            ÁLBUNS
+          </button>
+          <button 
+            onClick={() => setActiveTab('moments')}
+            style={{ 
+              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
+              color: activeTab === 'moments' ? 'var(--text)' : 'var(--muted)',
+              borderBottom: activeTab === 'moments' ? '2px solid var(--text)' : 'none',
+              borderRadius: 0, fontSize: '11px', fontWeight: '800'
+            }}
+          >
+            MOMENTOS
+          </button>
+          <button 
+            onClick={() => setActiveTab('posts')}
+            style={{ 
+              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
+              color: activeTab === 'posts' ? 'var(--text)' : 'var(--muted)',
+              borderBottom: activeTab === 'posts' ? '2px solid var(--text)' : 'none',
+              borderRadius: 0, fontSize: '11px', fontWeight: '800'
+            }}
+          >
+            POSTS
+          </button>
         </div>
 
-        {photobooks.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px', border: '2px dashed var(--border)' }}>
-            <p className="meta">Nenhum álbum publicado.</p>
+        {/* CONTEÚDO DAS ABAS */}
+        {activeTab === 'books' ? (
+          <div className="responsive-grid">
+            {photobooks.map((pb) => {
+              const cover = pb.photos?.[0]?.image_url;
+              return (
+                <div 
+                  key={pb.id} 
+                  className="card-border" 
+                  onClick={() => router.push(`/photobook/${pb.id}`)}
+                  style={{ position: 'relative', display: 'flex', flexDirection: 'column', cursor: 'pointer', overflow: 'hidden' }}
+                >
+                  <div style={{ aspectRatio: '1/1', overflow: 'hidden' }}>
+                    {cover ? (
+                      <img src={getOptimizedCloudinaryUrl(cover, { width: 500, height: 500, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ padding: '12px', borderTop: '2px solid var(--border)' }}>
+                    <h4 style={{ margin: 0, fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', lineHeight: '1.1' }}>{pb.title}</h4>
+                    <span className="meta" style={{ marginTop: '4px', fontSize: '9px', opacity: 0.7 }}>{pb.photos?.length || 0} fotos</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : activeTab === 'moments' ? (
+          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+            {moments.length > 0 ? (
+              moments.map(moment => (
+                <MomentCard key={moment.id} moment={moment} />
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '60px' }}>
+                <p className="meta">Nenhum momento compartilhado.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+            {posts.length > 0 ? (
+              posts.map(post => (
+                <PostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '60px' }}>
+                <p className="meta">Nenhum post publicado.</p>
+              </div>
+            )}
           </div>
         )}
       </main>

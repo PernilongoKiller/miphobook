@@ -82,43 +82,101 @@ export default function Header() {
 
   return (
     <>
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 15px', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, backgroundColor: 'var(--bg)', zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <h1 onClick={() => router.push('/')} style={{ margin: 0, fontSize: '18px', fontWeight: '400', cursor: 'pointer', fontFamily: '"Alfa Slab One", serif', letterSpacing: '0px' }}>miphobook</h1>
+      <nav style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        padding: '10px 20px', 
+        borderBottom: '1px solid var(--border)', 
+        position: 'sticky', 
+        top: 0, 
+        backgroundColor: 'var(--bg)', 
+        zIndex: 100 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <h1 onClick={() => router.push('/')} style={{ 
+            margin: 0, 
+            fontSize: '18px', 
+            fontWeight: '400', 
+            cursor: 'pointer', 
+            fontFamily: '"Alfa Slab One", serif',
+            color: 'var(--text)'
+          }}>miphobook</h1>
+          
           <div className="hide-on-mobile" ref={searchRef} style={{ position: 'relative', width: '220px' }}>
-            <input type="text" placeholder="Pesquisar..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', padding: '6px 0', backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid var(--border)', color: 'var(--text)', fontSize: '12px', outline: 'none' }} />
+            <input 
+              type="text" 
+              placeholder="Pesquisar..." 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+              style={{ 
+                width: '100%', 
+                padding: '6px 0',
+                backgroundColor: 'transparent', 
+                border: 'none', 
+                borderBottom: '1px solid var(--border)',
+                color: 'var(--text)', 
+                fontSize: '13px', 
+                outline: 'none' 
+              }} 
+            />
             {showResults && (
-              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: 'var(--bg)', border: '1px solid var(--border)', zIndex: 1000 }}>
+              <div style={{ 
+                position: 'absolute', 
+                top: '100%', 
+                left: 0, 
+                right: 0, 
+                backgroundColor: 'var(--bg)', 
+                border: '1px solid var(--border)', 
+                zIndex: 1000, 
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+              }}>
                 {searchResults.map(item => (
-                  <div key={item.id + item.type} onClick={() => { router.push(item.type === 'user' ? `/profile/${item.id}` : `/photobook/${item.id}`); setShowResults(false); setSearchQuery(''); }} style={{ padding: '10px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '12px' }}>
-                    {item.type === 'user' ? item.username : item.title} <span className="meta">({item.type === 'user' ? 'membro' : 'álbum'})</span>
+                  <div 
+                    key={item.id + item.type} 
+                    onClick={() => { router.push(item.type === 'user' ? `/profile/${item.id}` : `/photobook/${item.id}`); setShowResults(false); setSearchQuery(''); }} 
+                    style={{ padding: '10px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}
+                  >
+                    <div style={{ width: '24px', height: '24px', border: '1px solid var(--border)', flexShrink: 0, overflow: 'hidden' }}>
+                      {item.type === 'user' ? (
+                        item.avatar_url ? <img src={getOptimizedCloudinaryUrl(item.avatar_url, { width: 48, height: 48, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ backgroundColor: 'var(--border)', height: '100%' }} />
+                      ) : (
+                        <div style={{ backgroundColor: 'var(--text)', height: '100%', opacity: 0.1 }} />
+                      )}
+                    </div>
+                    <div style={{ flexGrow: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {item.type === 'user' ? item.username : item.title}
+                    </div>
+                    <span style={{ fontSize: '9px', opacity: 0.5 }}>{item.type === 'user' ? 'membro' : 'álbum'}</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
-          <button className="hide-on-mobile" onClick={() => router.push('/about')} style={{ ...iconButtonStyle, fontSize: '10px', fontWeight: 'bold' }}>SOBRE</button>
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {loading ? <Skeleton width="40px" height="20px" /> : userId ? (
             <>
               <div className="hide-on-mobile" style={{ display: 'flex', gap: '4px' }}>
+                <button onClick={() => router.push('/')} style={iconButtonStyle}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span>
+                </button>
                 <button onClick={() => router.push('/create-photobook')} style={iconButtonStyle}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>add_box</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span>
                 </button>
                 <button onClick={() => router.push(`/profile/${userId}`)} style={iconButtonStyle}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>person</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>person</span>
                 </button>
               </div>
               <div ref={notifRef} style={{ position: 'relative' }}>
                 <button onClick={() => { setShowNotifications(!showNotifications); markAsRead(); }} style={iconButtonStyle}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>notifications</span>
-                  {unreadCount > 0 && <span style={{ position: 'absolute', top: '4px', right: '4px', width: '6px', height: '6px', backgroundColor: 'red', borderRadius: '50%' }}></span>}
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>notifications</span>
+                  {unreadCount > 0 && <span style={{ position: 'absolute', top: '6px', right: '6px', width: '6px', height: '6px', backgroundColor: 'red', borderRadius: '50%' }}></span>}
                 </button>
                 {showNotifications && (
                   <div style={{ position: 'absolute', top: '130%', right: 0, width: '260px', backgroundColor: 'var(--bg)', border: '1px solid var(--border)', zIndex: 1000, padding: '10px' }}>
-                    {notifications.length === 0 ? <p className="meta" style={{ padding: '10px', textAlign: 'center' }}>Sem avisos.</p> : notifications.map(n => (
+                    {notifications.length === 0 ? <p style={{ fontSize: '11px', textAlign: 'center' }}>Sem avisos.</p> : notifications.map(n => (
                       <div key={n.id} onClick={() => { setShowNotifications(false); router.push(n.type === 'follow' ? `/profile/${n.actor_id}` : `/photobook/${n.entity_id}`); }} style={{ padding: '8px', borderBottom: '1px solid var(--border)', cursor: 'pointer', fontSize: '11px' }}>
                         <strong>{n.actor?.username}</strong> {n.type === 'like_pb' ? 'apreciou seu álbum' : 'interagiu'}
                       </div>
@@ -126,11 +184,8 @@ export default function Header() {
                   </div>
                 )}
               </div>
-              <button onClick={() => router.push('/settings')} style={iconButtonStyle}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>settings</span>
-              </button>
               <button onClick={toggleTheme} style={iconButtonStyle}>
-                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
+                <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
               </button>
             </>
           ) : <button onClick={() => router.push('/login')} style={{ fontSize: '11px' }}>Entrar</button>}
@@ -142,6 +197,7 @@ export default function Header() {
           <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span></button>
           <button onClick={() => setIsMobileSearchOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>search</span></button>
           <button onClick={() => router.push('/create-photobook')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span></button>
+          <button onClick={() => router.push('/about')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>info</span></button>
           <button onClick={() => router.push(`/profile/${userId}`)} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>person</span></button>
         </div>
       )}
@@ -153,8 +209,22 @@ export default function Header() {
             <button onClick={() => { setIsMobileSearchOpen(false); setSearchQuery(''); }} className="meta" style={{ border: 'none', background: 'none' }}>FECHAR</button>
           </div>
           {searchResults.map(item => (
-            <div key={item.id + item.type} onClick={() => { router.push(item.type === 'user' ? `/profile/${item.id}` : `/photobook/${item.id}`); setIsMobileSearchOpen(false); setSearchQuery(''); }} style={{ padding: '15px 0', borderBottom: '1px solid var(--border)', fontSize: '13px' }}>
-              {item.type === 'user' ? item.username : item.title} <span className="meta">({item.type === 'user' ? 'membro' : 'álbum'})</span>
+            <div 
+              key={item.id + item.type} 
+              onClick={() => { router.push(item.type === 'user' ? `/profile/${item.id}` : `/photobook/${item.id}`); setIsMobileSearchOpen(false); setSearchQuery(''); }} 
+              style={{ padding: '15px 0', borderBottom: '1px solid var(--border)', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '15px' }}
+            >
+              <div style={{ width: '32px', height: '32px', border: '1px solid var(--border)', flexShrink: 0, overflow: 'hidden' }}>
+                {item.type === 'user' ? (
+                  item.avatar_url ? <img src={getOptimizedCloudinaryUrl(item.avatar_url, { width: 64, height: 64, crop: 'fill' })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ backgroundColor: 'var(--border)', height: '100%' }} />
+                ) : (
+                  <div style={{ backgroundColor: 'var(--text)', height: '100%', opacity: 0.1 }} />
+                )}
+              </div>
+              <div style={{ flexGrow: 1 }}>
+                {item.type === 'user' ? item.username : item.title}
+                <div className="meta" style={{ fontSize: '10px', marginTop: '2px' }}>{item.type === 'user' ? 'Membro' : 'Álbum'}</div>
+              </div>
             </div>
           ))}
         </div>
