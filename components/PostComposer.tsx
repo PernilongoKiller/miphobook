@@ -44,20 +44,25 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
     setIsPosting(true)
 
     try {
-      const { error } = await supabase.from('posts').insert({
+      const { error, data } = await supabase.from('posts').insert({
         user_id: user.id,
         content: content.trim(),
         image_url: image
-      })
+      }).select()
 
-      if (error) throw error
+      if (error) {
+        console.error("Erro detalhado Supabase:", error)
+        throw error
+      }
 
+      console.log("Post criado com sucesso:", data)
       setContent('')
       setImage(null)
       toast('Postado com sucesso!', 'success')
       onPostCreated()
-    } catch (err) {
-      toast('Erro ao publicar post.', 'error')
+    } catch (err: any) {
+      console.error("Erro ao publicar post:", err)
+      toast(`Erro ao publicar: ${err.message || 'Erro desconhecido'}`, 'error')
     } finally {
       setIsPosting(false)
     }

@@ -167,7 +167,7 @@ export default function Header() {
 
           {loading ? <Skeleton width="40px" height="20px" /> : userId ? (            <>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={() => router.push('/')} style={iconButtonStyle}>
+                <button className="hide-on-mobile" onClick={() => router.push('/')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span>
                 </button>
                 <button onClick={() => router.push('/users')} style={iconButtonStyle}>
@@ -176,10 +176,10 @@ export default function Header() {
                 <button className="hide-on-mobile" onClick={() => router.push('/create-photobook')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span>
                 </button>
-                <button onClick={() => router.push(`/profile/${userId}`)} style={iconButtonStyle}>
+                <button className="hide-on-mobile" onClick={() => router.push(`/profile/${userId}`)} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>person</span>
                 </button>
-                <button onClick={() => router.push('/settings')} style={iconButtonStyle}>
+                <button className="hide-on-mobile" onClick={() => router.push('/settings')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>settings</span>
                 </button>
               </div>

@@ -49,6 +49,18 @@ export default function Home() {
           .limit(20)
       ])
 
+      if (postsRes.error) {
+        console.error("Erro ao buscar posts:", postsRes.error)
+        // Tentativa de busca sem post_likes se houver erro de relação
+        const fallbackPosts = await supabase
+          .from('posts')
+          .select('*, users(username, avatar_url)')
+          .order('created_at', { ascending: false })
+          .limit(20)
+        postsRes.data = fallbackPosts.data
+        postsRes.error = fallbackPosts.error
+      }
+
       const processedPosts = (postsRes.data || []).map(p => ({
         ...p,
         type: 'post',
@@ -128,6 +140,18 @@ export default function Home() {
           .order('created_at', { ascending: false })
           .limit(20)
       ])
+
+      if (postsRes.error) {
+        console.error("Erro ao buscar posts seguindo:", postsRes.error)
+        const fallbackPosts = await supabase
+          .from('posts')
+          .select('*, users(username, avatar_url)')
+          .in('user_id', followingIds)
+          .order('created_at', { ascending: false })
+          .limit(20)
+        postsRes.data = fallbackPosts.data
+        postsRes.error = fallbackPosts.error
+      }
 
       const processedPosts = (postsRes.data || []).map(p => ({
         ...p,
