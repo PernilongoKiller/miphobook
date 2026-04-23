@@ -56,11 +56,11 @@ export default function PostCard({ post }: PostCardProps) {
         const { error } = await supabase.from('post_likes').insert({ post_id: post.id, user_id: currentUser.id })
         if (error) throw error
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
       setIsLiked(originalLiked)
       setLikesCount(originalCount)
-      toast('Erro ao curtir post.', 'error')
+      toast(`Erro ao curtir: ${err.message || 'Erro desconhecido'}`, 'error')
     }
   }
 

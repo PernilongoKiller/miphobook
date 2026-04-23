@@ -27,11 +27,11 @@ export default function Home() {
     setLoading(true)
     
     try {
-      // Buscar posts e fotos em paralelo
+      // Buscar posts e fotos em paralelo (removido post_likes da query inicial para evitar erro de relação)
       const [postsRes, photosRes] = await Promise.all([
         supabase
           .from('posts')
-          .select('*, users(username, avatar_url), post_likes(user_id)')
+          .select('*, users(username, avatar_url)')
           .order('created_at', { ascending: false })
           .limit(20),
         supabase
@@ -50,24 +50,31 @@ export default function Home() {
       ])
 
       let finalPosts = postsRes.data || []
+      let postLikes: any[] = []
 
-      if (postsRes.error) {
-        console.error("Erro ao buscar posts:", postsRes.error)
-        // Tentativa de busca sem post_likes se houver erro de relação
-        const { data: fallbackData } = await supabase
-          .from('posts')
-          .select('*, users(username, avatar_url)')
-          .order('created_at', { ascending: false })
-          .limit(20)
-        finalPosts = fallbackData || []
+      if (finalPosts.length > 0) {
+        const postIds = finalPosts.map(p => p.id)
+        const { data: likesData, error: likesError } = await supabase
+          .from('post_likes')
+          .select('*')
+          .in('post_id', postIds)
+        
+        if (!likesError) {
+          postLikes = likesData || []
+        } else {
+          console.warn("Erro ao buscar post_likes, talvez a tabela não exista:", likesError)
+        }
       }
 
-      const processedPosts = finalPosts.map((p: any) => ({
-        ...p,
-        type: 'post',
-        likes_count: p.post_likes?.length || 0,
-        is_liked: user ? p.post_likes?.some((l: any) => l.user_id === user.id) : false
-      }))
+      const processedPosts = finalPosts.map((p: any) => {
+        const currentPostLikes = postLikes.filter(l => l.post_id === p.id)
+        return {
+          ...p,
+          type: 'post',
+          likes_count: currentPostLikes.length,
+          is_liked: user ? currentPostLikes.some((l: any) => l.user_id === user.id) : false
+        }
+      })
 
       const momentGroups: any[] = [];
       let currentGroup: any = null;
@@ -122,7 +129,7 @@ export default function Home() {
       const [postsRes, photosRes] = await Promise.all([
         supabase
           .from('posts')
-          .select('*, users(username, avatar_url), post_likes(user_id)')
+          .select('*, users(username, avatar_url)')
           .in('user_id', followingIds)
           .order('created_at', { ascending: false })
           .limit(20),
@@ -143,24 +150,31 @@ export default function Home() {
       ])
 
       let finalPosts = postsRes.data || []
+      let postLikes: any[] = []
 
-      if (postsRes.error) {
-        console.error("Erro ao buscar posts seguindo:", postsRes.error)
-        const { data: fallbackData } = await supabase
-          .from('posts')
-          .select('*, users(username, avatar_url)')
-          .in('user_id', followingIds)
-          .order('created_at', { ascending: false })
-          .limit(20)
-        finalPosts = fallbackData || []
+      if (finalPosts.length > 0) {
+        const postIds = finalPosts.map(p => p.id)
+        const { data: likesData, error: likesError } = await supabase
+          .from('post_likes')
+          .select('*')
+          .in('post_id', postIds)
+        
+        if (!likesError) {
+          postLikes = likesData || []
+        } else {
+          console.warn("Erro ao buscar post_likes no feed seguindo:", likesError)
+        }
       }
 
-      const processedPosts = finalPosts.map((p: any) => ({
-        ...p,
-        type: 'post',
-        likes_count: p.post_likes?.length || 0,
-        is_liked: user ? p.post_likes?.some((l: any) => l.user_id === user.id) : false
-      }))
+      const processedPosts = finalPosts.map((p: any) => {
+        const currentPostLikes = postLikes.filter(l => l.post_id === p.id)
+        return {
+          ...p,
+          type: 'post',
+          likes_count: currentPostLikes.length,
+          is_liked: user ? currentPostLikes.some((l: any) => l.user_id === user.id) : false
+        }
+      })
 
       const momentGroups: any[] = [];
       let currentGroup: any = null;

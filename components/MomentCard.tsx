@@ -74,7 +74,7 @@ export default function MomentCard({ moment }: MomentCardProps) {
       console.error(err)
       setIsLiked(originalLiked)
       setLikesCount(originalCount)
-      toast('Erro ao processar curtida.', 'error')
+      toast(`Erro ao processar curtida: ${err.message || 'Erro desconhecido'}`, 'error')
     }
   }
 
