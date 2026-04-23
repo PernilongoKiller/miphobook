@@ -90,7 +90,9 @@ export default function Header() {
         borderBottom: '1px solid var(--border)', 
         position: 'sticky', 
         top: 0, 
-        backgroundColor: 'var(--bg)', 
+        backgroundColor: 'rgba(var(--bg-rgb), 0.8)', 
+        backdropFilter: 'blur(15px)',
+        WebkitBackdropFilter: 'blur(15px)',
         zIndex: 100 
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
@@ -126,7 +128,9 @@ export default function Header() {
                 top: 'calc(100% + 8px)', 
                 left: 0, 
                 right: 0, 
-                backgroundColor: 'var(--bg)', 
+                backgroundColor: 'rgba(var(--bg-rgb), 0.7)', 
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
                 border: '1px solid var(--border)', 
                 borderRadius: 'var(--radius)',
                 zIndex: 1000, 
@@ -160,21 +164,23 @@ export default function Header() {
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <button className="hide-on-mobile" onClick={() => router.push('/about')} style={{ ...iconButtonStyle, fontSize: '10px', fontWeight: 'bold' }}>SOBRE</button>
-          
-          {loading ? <Skeleton width="40px" height="20px" /> : userId ? (
-            <>
-              <div className="hide-on-mobile" style={{ display: 'flex', gap: '8px' }}>
+
+          {loading ? <Skeleton width="40px" height="20px" /> : userId ? (            <>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={() => router.push('/')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span>
                 </button>
                 <button onClick={() => router.push('/users')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>group</span>
                 </button>
-                <button onClick={() => router.push('/create-photobook')} style={iconButtonStyle}>
+                <button className="hide-on-mobile" onClick={() => router.push('/create-photobook')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span>
                 </button>
                 <button onClick={() => router.push(`/profile/${userId}`)} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>person</span>
+                </button>
+                <button onClick={() => router.push('/settings')} style={iconButtonStyle}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>settings</span>
                 </button>
               </div>
               <div ref={notifRef} style={{ position: 'relative' }}>
@@ -188,7 +194,9 @@ export default function Header() {
                     top: 'calc(100% + 15px)', 
                     right: 0, 
                     width: '300px', 
-                    backgroundColor: 'var(--bg)', 
+                    backgroundColor: 'rgba(var(--bg-rgb), 0.7)', 
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
                     border: '1px solid var(--border)', 
                     borderRadius: 'var(--radius)',
                     zIndex: 1000, 
@@ -227,13 +235,13 @@ export default function Header() {
           <button onClick={() => router.push('/')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span></button>
           <button onClick={() => setIsMobileSearchOpen(true)} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>search</span></button>
           <button onClick={() => router.push('/create-photobook')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span></button>
-          <button onClick={() => router.push('/about')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>info</span></button>
+          <button onClick={() => router.push('/settings')} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>settings</span></button>
           <button onClick={() => router.push(`/profile/${userId}`)} style={{ background: 'none', border: 'none', color: 'var(--text)' }}><span className="material-symbols-outlined" style={{ fontSize: '22px' }}>person</span></button>
         </div>
       )}
 
       {isMobileSearchOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'var(--bg)', zIndex: 2000, padding: '15px' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(var(--bg-rgb), 0.7)', backdropFilter: 'blur(30px)', WebkitBackdropFilter: 'blur(30px)', zIndex: 2000, padding: '15px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
             <input ref={mobileSearchInputRef} type="text" placeholder="O que você está procurando?" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ flexGrow: 1, padding: '10px 0', fontSize: '15px', border: 'none', borderBottom: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none' }} />
             <button onClick={() => { setIsMobileSearchOpen(false); setSearchQuery(''); }} className="meta" style={{ border: 'none', background: 'none' }}>FECHAR</button>

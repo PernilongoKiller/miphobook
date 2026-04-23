@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
@@ -38,12 +38,24 @@ export default function MomentCard({ moment }: MomentCardProps) {
   const [likesCount, setLikesCount] = useState(moment.likes_count || 0)
   const [showComments, setShowComments] = useState(false)
 
+  useEffect(() => {
+    setIsLiked(moment.is_liked || false)
+    setLikesCount(moment.likes_count || 0)
+  }, [moment.is_liked, moment.likes_count])
+
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!supabase || !currentUser) return router.push('/login')
 
+    const originalLiked = isLiked
+    const originalCount = likesCount
+
+    // Optimistic update
+    setIsLiked(!originalLiked)
+    setLikesCount(prev => originalLiked ? Math.max(0, prev - 1) : prev + 1)
+
     try {
-      if (isLiked) {
+      if (originalLiked) {
         const { error } = await supabase
           .from('photo_likes')
           .delete()
@@ -51,18 +63,17 @@ export default function MomentCard({ moment }: MomentCardProps) {
           .eq('user_id', currentUser.id)
         
         if (error) throw error
-        setIsLiked(false)
-        setLikesCount(prev => Math.max(0, prev - 1))
       } else {
         const { error } = await supabase
           .from('photo_likes')
           .insert({ photo_id: moment.id, user_id: currentUser.id })
         
         if (error) throw error
-        setIsLiked(true)
-        setLikesCount(prev => prev + 1)
       }
     } catch (err: any) {
+      console.error(err)
+      setIsLiked(originalLiked)
+      setLikesCount(originalCount)
       toast('Erro ao processar curtida.', 'error')
     }
   }

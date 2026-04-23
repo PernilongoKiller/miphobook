@@ -32,12 +32,18 @@ export default function UserProfilePage() {
     try {
       const { data } = await supabase
         .from('posts')
-        .select('*, users(username, avatar_url)')
+        .select('*, users(username, avatar_url), post_likes(user_id)')
         .eq('user_id', id)
         .order('created_at', { ascending: false })
-      setPosts(data || [])
+      
+      const processed = (data || []).map(p => ({
+        ...p,
+        likes_count: p.post_likes?.length || 0,
+        is_liked: currentUser ? p.post_likes?.some((l: any) => l.user_id === currentUser.id) : false
+      }))
+      setPosts(processed)
     } catch (err) { console.error(err) }
-  }, [supabase, id])
+  }, [supabase, id, currentUser])
 
   const fetchMoments = useCallback(async () => {
     if (!supabase || !id) return

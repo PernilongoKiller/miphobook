@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
@@ -32,21 +32,34 @@ export default function PostCard({ post }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(post.is_liked || false)
   const [likesCount, setLikesCount] = useState(post.likes_count || 0)
 
+  useEffect(() => {
+    setIsLiked(post.is_liked || false)
+    setLikesCount(post.likes_count || 0)
+  }, [post.is_liked, post.likes_count])
+
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!supabase || !currentUser) return router.push('/login')
 
+    const originalLiked = isLiked
+    const originalCount = likesCount
+
+    // Optimistic update
+    setIsLiked(!originalLiked)
+    setLikesCount(prev => originalLiked ? Math.max(0, prev - 1) : prev + 1)
+
     try {
-      if (isLiked) {
-        await supabase.from('post_likes').delete().eq('post_id', post.id).eq('user_id', currentUser.id)
-        setIsLiked(false)
-        setLikesCount(prev => Math.max(0, prev - 1))
+      if (originalLiked) {
+        const { error } = await supabase.from('post_likes').delete().eq('post_id', post.id).eq('user_id', currentUser.id)
+        if (error) throw error
       } else {
-        await supabase.from('post_likes').insert({ post_id: post.id, user_id: currentUser.id })
-        setIsLiked(true)
-        setLikesCount(prev => prev + 1)
+        const { error } = await supabase.from('post_likes').insert({ post_id: post.id, user_id: currentUser.id })
+        if (error) throw error
       }
     } catch (err) {
+      console.error(err)
+      setIsLiked(originalLiked)
+      setLikesCount(originalCount)
       toast('Erro ao curtir post.', 'error')
     }
   }

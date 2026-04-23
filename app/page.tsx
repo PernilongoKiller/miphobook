@@ -29,7 +29,7 @@ export default function Home() {
     try {
       const { data: postsData } = await supabase
         .from('posts')
-        .select('*, users(username, avatar_url)')
+        .select('*, users(username, avatar_url), post_likes(user_id)')
         .order('created_at', { ascending: false })
         .limit(20)
 
@@ -40,10 +40,19 @@ export default function Home() {
           photobooks (
             id, title,
             users (id, username, avatar_url)
-          )
+          ),
+          photo_likes(user_id),
+          photo_comments(id)
         `)
         .order('created_at', { ascending: false })
         .limit(20)
+
+      const processedPosts = (postsData || []).map(p => ({
+        ...p,
+        type: 'post',
+        likes_count: p.post_likes?.length || 0,
+        is_liked: user ? p.post_likes?.some((l: any) => l.user_id === user.id) : false
+      }))
 
       const momentGroups: any[] = [];
       let currentGroup: any = null;
@@ -51,7 +60,14 @@ export default function Home() {
       for (const photo of photosData || []) {
         const photoTime = new Date(photo.created_at).getTime();
         if (!currentGroup || currentGroup.photobook_id !== photo.photobook_id || currentGroup.description !== photo.description || Math.abs(photoTime - new Date(currentGroup.created_at).getTime()) > 5000) {
-          currentGroup = { ...photo, photos: [photo], type: 'moment' };
+          currentGroup = { 
+            ...photo, 
+            photos: [photo], 
+            type: 'moment',
+            likes_count: photo.photo_likes?.length || 0,
+            is_liked: user ? photo.photo_likes?.some((l: any) => l.user_id === user.id) : false,
+            comments_count: photo.photo_comments?.length || 0
+          };
           momentGroups.push(currentGroup);
         } else {
           currentGroup.photos.push(photo);
@@ -59,7 +75,7 @@ export default function Home() {
       }
 
       const combined = [
-        ...(postsData || []).map(p => ({ ...p, type: 'post' })),
+        ...processedPosts,
         ...momentGroups
       ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
@@ -69,7 +85,7 @@ export default function Home() {
     } finally {
       setLoading(false)
     }
-  }, [supabase])
+  }, [supabase, user])
 
   const fetchFollowedMoments = useCallback(async (currentId: string) => {
     if (!supabase) return
@@ -103,11 +119,11 @@ export default function Home() {
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main className="main-container" style={{ display: 'flex', gap: '60px', alignItems: 'flex-start' }}>
+      <main className="main-container" style={{ display: 'flex', alignItems: 'flex-start' }}>
         
         <div style={{ flexGrow: 1, maxWidth: activeTab !== 'explore' ? '600px' : 'none', margin: activeTab !== 'explore' ? '0 auto' : '0' }}>
           
-          <div style={{ display: 'flex', gap: '25px', marginBottom: '30px', borderBottom: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', gap: '25px', marginBottom: '30px', borderBottom: '1px solid var(--border)', padding: '0 15px' }}>
             <span 
               onClick={() => setActiveTab('explore')} 
               style={{ 

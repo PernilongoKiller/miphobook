@@ -66,7 +66,7 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
   if (!user) return null
 
   return (
-    <div className="social-card" style={{ padding: '16px', marginBottom: '24px' }}>
+    <div className="social-card" style={{ padding: '16px' }}>
       <div style={{ display: 'flex', gap: '12px' }}>
         <div style={{ width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0, backgroundColor: 'var(--border)' }}>
           <img 
