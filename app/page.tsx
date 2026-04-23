@@ -49,19 +49,20 @@ export default function Home() {
           .limit(20)
       ])
 
+      let finalPosts = postsRes.data || []
+
       if (postsRes.error) {
         console.error("Erro ao buscar posts:", postsRes.error)
         // Tentativa de busca sem post_likes se houver erro de relação
-        const fallbackPosts = await supabase
+        const { data: fallbackData } = await supabase
           .from('posts')
           .select('*, users(username, avatar_url)')
           .order('created_at', { ascending: false })
           .limit(20)
-        postsRes.data = fallbackPosts.data
-        postsRes.error = fallbackPosts.error
+        finalPosts = fallbackData || []
       }
 
-      const processedPosts = (postsRes.data || []).map(p => ({
+      const processedPosts = finalPosts.map((p: any) => ({
         ...p,
         type: 'post',
         likes_count: p.post_likes?.length || 0,
@@ -141,19 +142,20 @@ export default function Home() {
           .limit(20)
       ])
 
+      let finalPosts = postsRes.data || []
+
       if (postsRes.error) {
         console.error("Erro ao buscar posts seguindo:", postsRes.error)
-        const fallbackPosts = await supabase
+        const { data: fallbackData } = await supabase
           .from('posts')
           .select('*, users(username, avatar_url)')
           .in('user_id', followingIds)
           .order('created_at', { ascending: false })
           .limit(20)
-        postsRes.data = fallbackPosts.data
-        postsRes.error = fallbackPosts.error
+        finalPosts = fallbackData || []
       }
 
-      const processedPosts = (postsRes.data || []).map(p => ({
+      const processedPosts = finalPosts.map((p: any) => ({
         ...p,
         type: 'post',
         likes_count: p.post_likes?.length || 0,
