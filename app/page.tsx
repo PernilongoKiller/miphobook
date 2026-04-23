@@ -91,10 +91,82 @@ export default function Home() {
     if (!supabase) return
     setLoading(true)
     try {
-      // Lógica de busca seguindo...
+      // Buscar IDs das pessoas que eu sigo
+      const { data: follows } = await supabase
+        .from('follows')
+        .select('following_id')
+        .eq('follower_id', currentId)
+      
+      const followingIds = (follows || []).map(f => f.following_id)
+      
+      if (followingIds.length === 0) {
+        setFeedItems([])
+        setLoading(false)
+        return
+      }
+
+      // Buscar posts e fotos dessas pessoas
+      const { data: postsData } = await supabase
+        .from('posts')
+        .select('*, users(username, avatar_url), post_likes(user_id)')
+        .in('user_id', followingIds)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      const { data: photosData } = await supabase
+        .from('photos')
+        .select(`
+          *,
+          photobooks (
+            id, title,
+            users (id, username, avatar_url)
+          ),
+          photo_likes(user_id),
+          photo_comments(id)
+        `)
+        .in('user_id', followingIds)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      const processedPosts = (postsData || []).map(p => ({
+        ...p,
+        type: 'post',
+        likes_count: p.post_likes?.length || 0,
+        is_liked: user ? p.post_likes?.some((l: any) => l.user_id === user.id) : false
+      }))
+
+      const momentGroups: any[] = [];
+      let currentGroup: any = null;
+
+      for (const photo of photosData || []) {
+        const photoTime = new Date(photo.created_at).getTime();
+        if (!currentGroup || currentGroup.photobook_id !== photo.photobook_id || currentGroup.description !== photo.description || Math.abs(photoTime - new Date(currentGroup.created_at).getTime()) > 5000) {
+          currentGroup = { 
+            ...photo, 
+            photos: [photo], 
+            type: 'moment',
+            likes_count: photo.photo_likes?.length || 0,
+            is_liked: user ? photo.photo_likes?.some((l: any) => l.user_id === user.id) : false,
+            comments_count: photo.photo_comments?.length || 0
+          };
+          momentGroups.push(currentGroup);
+        } else {
+          currentGroup.photos.push(photo);
+        }
+      }
+
+      const combined = [
+        ...processedPosts,
+        ...momentGroups
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+      setFeedItems(combined)
+    } catch (err) {
+      console.error("Erro ao buscar feed seguindo:", err)
+    } finally {
       setLoading(false)
-    } catch (err) { setLoading(false) }
-  }, [supabase])
+    }
+  }, [supabase, user])
 
   const fetchPhotobooks = useCallback(async () => {
     if (!supabase) return
@@ -119,11 +191,11 @@ export default function Home() {
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main className="main-container" style={{ display: 'flex', alignItems: 'flex-start' }}>
+      <main className="main-container" style={{ display: 'flex', justifyContent: 'center' }}>
         
-        <div style={{ flexGrow: 1, maxWidth: activeTab !== 'explore' ? '600px' : 'none', margin: activeTab !== 'explore' ? '0 auto' : '0' }}>
+        <div style={{ flexGrow: 1, maxWidth: activeTab !== 'explore' ? '600px' : '1000px', margin: '0 auto' }}>
           
-          <div style={{ display: 'flex', gap: '25px', marginBottom: '30px', borderBottom: '1px solid var(--border)', padding: '0 15px' }}>
+          <div style={{ display: 'flex', gap: '25px', marginBottom: '30px', borderBottom: '1px solid var(--border)', padding: '0 15px', justifyContent: 'center' }}>
             <span 
               onClick={() => setActiveTab('explore')} 
               style={{ 
@@ -221,8 +293,6 @@ export default function Home() {
             </div>
           )}
         </div>
-
-        <Sidebar />
       </main>
     </div>
   )
