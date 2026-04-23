@@ -170,9 +170,12 @@ export default function Header() {
                 <button className="hide-on-mobile" onClick={() => router.push('/')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>home</span>
                 </button>
+                
+                {/* Botão de Membros - Visível no Mobile */}
                 <button onClick={() => router.push('/users')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>group</span>
                 </button>
+
                 <button className="hide-on-mobile" onClick={() => router.push('/create-photobook')} style={iconButtonStyle}>
                   <span className="material-symbols-outlined" style={{ fontSize: '22px' }}>add_box</span>
                 </button>

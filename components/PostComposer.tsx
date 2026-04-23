@@ -48,18 +48,19 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
         user_id: user.id,
         content: content.trim(),
         image_url: image
-      }).select()
+      })
 
       if (error) {
-        console.error("Erro detalhado Supabase:", error)
+        console.error("Erro Supabase:", error)
         throw error
       }
 
-      console.log("Post criado com sucesso:", data)
       setContent('')
       setImage(null)
       toast('Postado com sucesso!', 'success')
-      onPostCreated()
+      
+      // Pequeno delay para o banco processar antes de recarregar o feed
+      setTimeout(() => onPostCreated(), 500)
     } catch (err: any) {
       console.error("Erro ao publicar post:", err)
       toast(`Erro ao publicar: ${err.message || 'Erro desconhecido'}`, 'error')
