@@ -27,27 +27,29 @@ export default function Home() {
     setLoading(true)
     
     try {
-      const { data: postsData } = await supabase
-        .from('posts')
-        .select('*, users(username, avatar_url), post_likes(user_id)')
-        .order('created_at', { ascending: false })
-        .limit(20)
+      // Buscar posts e fotos em paralelo
+      const [postsRes, photosRes] = await Promise.all([
+        supabase
+          .from('posts')
+          .select('*, users(username, avatar_url), post_likes(user_id)')
+          .order('created_at', { ascending: false })
+          .limit(20),
+        supabase
+          .from('photos')
+          .select(`
+            *,
+            photobooks (
+              id, title,
+              users (id, username, avatar_url)
+            ),
+            photo_likes(user_id),
+            photo_comments(id)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(20)
+      ])
 
-      const { data: photosData } = await supabase
-        .from('photos')
-        .select(`
-          *,
-          photobooks (
-            id, title,
-            users (id, username, avatar_url)
-          ),
-          photo_likes(user_id),
-          photo_comments(id)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(20)
-
-      const processedPosts = (postsData || []).map(p => ({
+      const processedPosts = (postsRes.data || []).map(p => ({
         ...p,
         type: 'post',
         likes_count: p.post_likes?.length || 0,
@@ -57,7 +59,7 @@ export default function Home() {
       const momentGroups: any[] = [];
       let currentGroup: any = null;
 
-      for (const photo of photosData || []) {
+      for (const photo of photosRes.data || []) {
         const photoTime = new Date(photo.created_at).getTime();
         if (!currentGroup || currentGroup.photobook_id !== photo.photobook_id || currentGroup.description !== photo.description || Math.abs(photoTime - new Date(currentGroup.created_at).getTime()) > 5000) {
           currentGroup = { 
@@ -91,7 +93,6 @@ export default function Home() {
     if (!supabase) return
     setLoading(true)
     try {
-      // Buscar IDs das pessoas que eu sigo
       const { data: follows } = await supabase
         .from('follows')
         .select('following_id')
@@ -105,30 +106,30 @@ export default function Home() {
         return
       }
 
-      // Buscar posts e fotos dessas pessoas
-      const { data: postsData } = await supabase
-        .from('posts')
-        .select('*, users(username, avatar_url), post_likes(user_id)')
-        .in('user_id', followingIds)
-        .order('created_at', { ascending: false })
-        .limit(20)
+      const [postsRes, photosRes] = await Promise.all([
+        supabase
+          .from('posts')
+          .select('*, users(username, avatar_url), post_likes(user_id)')
+          .in('user_id', followingIds)
+          .order('created_at', { ascending: false })
+          .limit(20),
+        supabase
+          .from('photos')
+          .select(`
+            *,
+            photobooks (
+              id, title,
+              users (id, username, avatar_url)
+            ),
+            photo_likes(user_id),
+            photo_comments(id)
+          `)
+          .in('user_id', followingIds)
+          .order('created_at', { ascending: false })
+          .limit(20)
+      ])
 
-      const { data: photosData } = await supabase
-        .from('photos')
-        .select(`
-          *,
-          photobooks (
-            id, title,
-            users (id, username, avatar_url)
-          ),
-          photo_likes(user_id),
-          photo_comments(id)
-        `)
-        .in('user_id', followingIds)
-        .order('created_at', { ascending: false })
-        .limit(20)
-
-      const processedPosts = (postsData || []).map(p => ({
+      const processedPosts = (postsRes.data || []).map(p => ({
         ...p,
         type: 'post',
         likes_count: p.post_likes?.length || 0,
@@ -138,7 +139,7 @@ export default function Home() {
       const momentGroups: any[] = [];
       let currentGroup: any = null;
 
-      for (const photo of photosData || []) {
+      for (const photo of photosRes.data || []) {
         const photoTime = new Date(photo.created_at).getTime();
         if (!currentGroup || currentGroup.photobook_id !== photo.photobook_id || currentGroup.description !== photo.description || Math.abs(photoTime - new Date(currentGroup.created_at).getTime()) > 5000) {
           currentGroup = { 
@@ -193,7 +194,7 @@ export default function Home() {
 
       <main className="main-container" style={{ display: 'flex', justifyContent: 'center' }}>
         
-        <div style={{ flexGrow: 1, maxWidth: activeTab !== 'explore' ? '600px' : '1000px', margin: '0 auto' }}>
+        <div style={{ flexGrow: 1, maxWidth: activeTab !== 'explore' ? '600px' : '1000px' }}>
           
           <div style={{ display: 'flex', gap: '25px', marginBottom: '30px', borderBottom: '1px solid var(--border)', padding: '0 15px', justifyContent: 'center' }}>
             <span 
