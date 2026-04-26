@@ -68,9 +68,18 @@ body::after {
 .social-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm); /* Voltei para o radius-sm para ser mais reto/clássico */
   margin-bottom: 24px;
   overflow: hidden;
+  box-shadow: none; /* Removi a sombra para um look mais clean e editorial */
+}
+
+.social-card:hover {
+  border-color: var(--muted); /* Apenas uma mudança sutil na borda */
+}
+
+[data-theme="dark"] .social-card:hover {
+  border-color: var(--muted);
 }
 
 button {
@@ -297,6 +306,16 @@ button:hover:not(:disabled) {
   background-color: var(--border);
   position: relative;
   overflow: hidden;
+}
+
+@keyframes like-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.animate-like {
+  animation: like-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .skeleton::after {

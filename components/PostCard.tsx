@@ -33,6 +33,7 @@ export default function PostCard({ post }: PostCardProps) {
   const [likesCount, setLikesCount] = useState(post.likes_count || 0)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleted, setIsDeleted] = useState(false)
+  const [animateLike, setAnimateLike] = useState(false)
 
   useEffect(() => {
     setIsLiked(post.is_liked || false)
@@ -87,6 +88,11 @@ export default function PostCard({ post }: PostCardProps) {
     // Optimistic update
     setIsLiked(!originalLiked)
     setLikesCount(prev => originalLiked ? Math.max(0, prev - 1) : prev + 1)
+    
+    if (!originalLiked) {
+      setAnimateLike(true)
+      setTimeout(() => setAnimateLike(false), 300)
+    }
 
     try {
       if (originalLiked) {
@@ -178,7 +184,10 @@ export default function PostCard({ post }: PostCardProps) {
               cursor: 'pointer'
             }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: '26px', fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}>
+            <span 
+              className={`material-symbols-outlined ${animateLike ? 'animate-like' : ''}`} 
+              style={{ fontSize: '26px', fontVariationSettings: isLiked ? "'FILL' 1" : "'FILL' 0" }}
+            >
               favorite
             </span>
           </button>

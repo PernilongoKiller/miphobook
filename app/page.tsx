@@ -18,9 +18,93 @@ export default function Home() {
   const { user } = useUser()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'explore' | 'feed' | 'following'>('explore')
+  const [activeTab, setActiveTab] = useState<'explore' | 'feed' | 'following' | 'trending'>('explore')
   const [photobooks, setPhotobooks] = useState<any[]>([])
   const [feedItems, setFeedItems] = useState<any[]>([])
+
+  const fetchTrendingFeed = useCallback(async () => {
+    if (!supabase) return
+    setLoading(true)
+    
+    try {
+      // Buscar posts e fotos recentes para calcular o que está em alta
+      const [postsRes, photosRes] = await Promise.all([
+        supabase
+          .from('posts')
+          .select('*, users(username, avatar_url)')
+          .order('created_at', { ascending: false })
+          .limit(50),
+        supabase
+          .from('photos')
+          .select(`
+            *,
+            photobooks (
+              id, title,
+              users (id, username, avatar_url)
+            ),
+            photo_likes(user_id),
+            photo_comments(id)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(50)
+      ])
+
+      let finalPosts = postsRes.data || []
+      let postLikes: any[] = []
+
+      if (finalPosts.length > 0) {
+        const postIds = finalPosts.map(p => p.id)
+        const { data: likesData } = await supabase
+          .from('post_likes')
+          .select('*')
+          .in('post_id', postIds)
+        postLikes = likesData || []
+      }
+
+      const processedPosts = finalPosts.map((p: any) => {
+        const currentPostLikes = postLikes.filter(l => l.post_id === p.id)
+        return {
+          ...p,
+          type: 'post',
+          likes_count: currentPostLikes.length,
+          is_liked: user ? currentPostLikes.some((l: any) => l.user_id === user.id) : false,
+          score: currentPostLikes.length * 2 // Score básico para trending
+        }
+      })
+
+      const momentGroups: any[] = [];
+      let currentGroup: any = null;
+
+      for (const photo of photosRes.data || []) {
+        const photoTime = new Date(photo.created_at).getTime();
+        if (!currentGroup || currentGroup.photobook_id !== photo.photobook_id || currentGroup.description !== photo.description || Math.abs(photoTime - new Date(currentGroup.created_at).getTime()) > 5000) {
+          currentGroup = { 
+            ...photo, 
+            photos: [photo], 
+            type: 'moment',
+            likes_count: photo.photo_likes?.length || 0,
+            is_liked: user ? photo.photo_likes?.some((l: any) => l.user_id === user.id) : false,
+            comments_count: photo.photo_comments?.length || 0,
+            score: (photo.photo_likes?.length || 0) * 2 + (photo.photo_comments?.length || 0) * 3
+          };
+          momentGroups.push(currentGroup);
+        } else {
+          currentGroup.photos.push(photo);
+        }
+      }
+
+      const combined = [
+        ...processedPosts,
+        ...momentGroups
+      ].sort((a, b) => b.score - a.score) // Ordena pelo score (engajamento)
+
+      setFeedItems(combined)
+    } catch (err) {
+      console.error("Erro ao buscar feed em alta:", err)
+    } finally {
+      setLoading(false)
+    }
+  }, [supabase, user])
 
   const fetchGlobalFeed = useCallback(async () => {
     if (!supabase) return
@@ -226,7 +310,8 @@ export default function Home() {
     if (activeTab === 'explore') fetchPhotobooks()
     else if (activeTab === 'feed') fetchGlobalFeed()
     else if (activeTab === 'following' && user) fetchFollowedMoments(user.id)
-  }, [activeTab, fetchPhotobooks, fetchGlobalFeed, fetchFollowedMoments, user])
+    else if (activeTab === 'trending') fetchTrendingFeed()
+  }, [activeTab, fetchPhotobooks, fetchGlobalFeed, fetchFollowedMoments, fetchTrendingFeed, user])
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
@@ -257,6 +342,16 @@ export default function Home() {
               }}
             >Feed</span>
 
+            <span 
+              onClick={() => setActiveTab('trending')} 
+              style={{ 
+                padding: '12px 0', fontSize: '11px', fontWeight: activeTab === 'trending' ? '700' : '400',
+                cursor: 'pointer', color: activeTab === 'trending' ? 'var(--text)' : 'var(--muted)',
+                borderBottom: activeTab === 'trending' ? '2px solid var(--text)' : 'none',
+                textTransform: 'uppercase', letterSpacing: '1px'
+              }}
+            >Em Alta</span>
+
             {user && (
               <span 
                 onClick={() => setActiveTab('following')} 
@@ -269,6 +364,35 @@ export default function Home() {
               >Seguindo</span>
             )}
           </div>
+
+          {(activeTab === 'feed' || activeTab === 'trending') && (
+            <div style={{ 
+              display: 'flex', 
+              gap: '15px', 
+              marginBottom: '20px', 
+              overflowX: 'auto', 
+              padding: '0 5px',
+              borderBottom: '1px solid var(--border)',
+              paddingBottom: '10px'
+            }} className="no-scrollbar">
+              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--muted)', textTransform: 'uppercase' }}>Vibes:</span>
+              {['#casual', '#arte', '#viagem', '#natureza', '#memoria'].map(vibe => (
+                <span 
+                  key={vibe}
+                  style={{ 
+                    fontSize: '11px',
+                    color: 'var(--muted)',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}
+                  onClick={() => toast(`Filtrando por ${vibe}`, 'success')}
+                >
+                  {vibe}
+                </span>
+              ))}
+            </div>
+          )}
 
           {activeTab === 'feed' && user && (
             <PostComposer onPostCreated={fetchGlobalFeed} />
