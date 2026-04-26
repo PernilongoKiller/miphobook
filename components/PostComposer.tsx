@@ -23,17 +23,24 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
     setIsUploading(true)
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('upload_preset', 'ml_default')
+    formData.append('upload_preset', 'miphobook_unsigned_upload')
 
     try {
       const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
         method: 'POST',
         body: formData
       })
+      
       const data = await res.json()
+      
+      if (data.error) {
+        throw new Error(data.error.message)
+      }
+      
       setImage(data.secure_url)
-    } catch (err) {
-      toast('Erro ao carregar imagem.', 'error')
+    } catch (err: any) {
+      console.error("Erro upload Cloudinary:", err)
+      toast(`Erro ao carregar imagem: ${err.message || 'Erro desconhecido'}`, 'error')
     } finally {
       setIsUploading(false)
     }

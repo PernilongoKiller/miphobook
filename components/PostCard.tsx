@@ -31,11 +31,51 @@ export default function PostCard({ post }: PostCardProps) {
   
   const [isLiked, setIsLiked] = useState(post.is_liked || false)
   const [likesCount, setLikesCount] = useState(post.likes_count || 0)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleted, setIsDeleted] = useState(false)
 
   useEffect(() => {
     setIsLiked(post.is_liked || false)
     setLikesCount(post.likes_count || 0)
   }, [post.is_liked, post.likes_count])
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (!supabase || !currentUser || isDeleting) return
+    
+    if (!confirm('Tem certeza que deseja apagar esta postagem?')) return
+
+    setIsDeleting(true)
+
+    try {
+      // 1. Se tiver imagem, apagar do Cloudinary
+      if (post.image_url && post.image_url.includes('cloudinary.com')) {
+        const parts = post.image_url.split('/')
+        const fileName = parts[parts.length - 1]
+        const publicId = fileName.split('.')[0]
+        
+        if (publicId) {
+          await fetch('/api/cloudinary/delete', {
+            method: 'POST',
+            body: JSON.stringify({ publicId })
+          })
+        }
+      }
+
+      // 2. Apagar do Supabase
+      const { error } = await supabase.from('posts').delete().eq('id', post.id)
+      
+      if (error) throw error
+
+      setIsDeleted(true)
+      toast('Postagem apagada.', 'success')
+    } catch (err: any) {
+      console.error(err)
+      toast(`Erro ao apagar: ${err.message || 'Erro desconhecido'}`, 'error')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -64,8 +104,12 @@ export default function PostCard({ post }: PostCardProps) {
     }
   }
 
+  if (isDeleted) return null
+
+  const isAuthor = currentUser?.id === post.user_id
+
   return (
-    <article className="social-card" style={{ marginBottom: '24px' }}>
+    <article className="social-card" style={{ marginBottom: '24px', opacity: isDeleting ? 0.5 : 1 }}>
       <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div 
           onClick={() => router.push(`/profile/${post.user_id}`)}
@@ -78,7 +122,7 @@ export default function PostCard({ post }: PostCardProps) {
             alt={post.users?.username}
           />
         </div>
-        <div>
+        <div style={{ flexGrow: 1 }}>
           <span 
             onClick={() => router.push(`/profile/${post.user_id}`)}
             style={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}
@@ -89,6 +133,16 @@ export default function PostCard({ post }: PostCardProps) {
             {new Date(post.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
           </div>
         </div>
+        
+        {isAuthor && (
+          <button 
+            onClick={handleDelete}
+            disabled={isDeleting}
+            style={{ border: 'none', background: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '4px' }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+          </button>
+        )}
       </div>
 
       <div style={{ padding: '0 16px 12px 16px', fontSize: '15px', lineHeight: '1.5' }}>
