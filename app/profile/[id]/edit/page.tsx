@@ -135,7 +135,7 @@ export default function EditProfilePage() {
           {/* AVATAR EDIT */}
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
             <div className="card-border" style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg)', overflow: 'hidden', flexShrink: 0 }}>
-              {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined">person</span></div>}
+              {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Avatar" /> : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined">person</span></div>}
             </div>
             <div style={{ position: 'relative' }}>
                <button type="button" style={{ height: '30px', fontSize: '10px' }}>ALTERAR FOTO</button>
