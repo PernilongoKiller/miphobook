@@ -364,10 +364,10 @@ export default function PhotobookDetailPage() {
                   {/* COMENTÁRIOS */}
                   <div style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {group.comments.map((c: any) => (
-                      <div key={c.id} style={{ fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div key={c.id} style={{ fontSize: '13px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', color: 'var(--text)' }}>
                         <span style={{ lineHeight: '1.4' }}><strong style={{ fontWeight: '600', marginRight: '8px' }}>{c.users?.username}</strong> {c.content}</span>
                         {(currentUser?.id === c.user_id || isOwner) && (
-                          <span onClick={() => handleDeleteComment(group.id, c.id)} style={{ cursor: 'pointer', opacity: 0.4, fontSize: '10px', padding: '2px 5px', marginLeft: '10px' }}>APAGAR</span>
+                          <span onClick={() => handleDeleteComment(group.id, c.id)} style={{ cursor: 'pointer', opacity: 0.4, fontSize: '10px', padding: '2px 5px', marginLeft: '10px', color: 'var(--text)' }}>APAGAR</span>
                         )}
                       </div>
                     ))}
@@ -379,7 +379,7 @@ export default function PhotobookDetailPage() {
                         value={newComment[group.id] || ''} 
                         onChange={(e) => setNewComment(prev => ({ ...prev, [group.id]: e.target.value }))}
                         onKeyDown={(e) => e.key === 'Enter' && handleAddComment(group.id)}
-                        style={{ border: 'none', borderBottom: '1px solid var(--border)', padding: '8px 0', fontSize: '13px', outline: 'none', width: '100%', maxWidth: '300px', backgroundColor: 'transparent', marginTop: '10px' }}
+                        style={{ border: 'none', borderBottom: '1px solid var(--border)', padding: '8px 0', fontSize: '13px', outline: 'none', width: '100%', maxWidth: '300px', backgroundColor: 'transparent', marginTop: '10px', color: 'var(--text)' }}
                       />
                     )}
                   </div>

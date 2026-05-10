@@ -150,11 +150,13 @@ export default function MuralGrid({ items, isOwner, onItemDeleted }: MuralGridPr
           background-color: #fffdf2;
           border-bottom: 2px solid rgba(0,0,0,0.05);
           transform: rotate(-1deg);
+          color: #1a1a1a; /* Garante texto escuro no papel claro */
         }
         
         [data-theme="dark"] .mural-item-text {
           background-color: #242420;
           color: #e8e2d9;
+          border-color: #333;
         }
 
         .mural-title {
