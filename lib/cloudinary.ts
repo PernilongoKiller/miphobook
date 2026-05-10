@@ -28,3 +28,30 @@ export function getOptimizedCloudinaryUrl(url: string, { width, height, quality 
 
   return `${parts[0]}/upload/${transformationString}/${parts[1]}`;
 }
+
+/**
+ * Extrai o Public ID de uma URL do Cloudinary.
+ * @param url A URL do Cloudinary.
+ * @returns O Public ID ou null se não for uma URL válida.
+ */
+export function extractPublicIdFromUrl(url: string): string | null {
+  if (!url || !url.includes('cloudinary.com')) return null;
+  
+  const parts = url.split('/upload/');
+  if (parts.length < 2) return null;
+  
+  const pathAfterUpload = parts[1];
+  const pathParts = pathAfterUpload.split('/');
+  
+  // Remove a versão (ex: v12345678) se estiver presente
+  if (pathParts[0].match(/^v\d+$/)) {
+    pathParts.shift();
+  }
+  
+  const publicIdWithExtension = pathParts.join('/');
+  const lastDotIndex = publicIdWithExtension.lastIndexOf('.');
+  
+  if (lastDotIndex === -1) return publicIdWithExtension;
+  
+  return publicIdWithExtension.substring(0, lastDotIndex);
+}

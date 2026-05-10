@@ -21,6 +21,9 @@ export async function POST(request: Request) {
 
     if (result.result === 'ok') {
       return NextResponse.json({ message: 'Image deleted successfully' });
+    } else if (result.result === 'not found') {
+      console.warn(`Image with publicId ${publicId} not found in Cloudinary.`);
+      return NextResponse.json({ message: 'Image not found in Cloudinary, but proceeding', warning: 'not_found' });
     } else {
       console.error('Cloudinary deletion failed:', result);
       return NextResponse.json({ error: `Failed to delete image from Cloudinary: ${result.result}` }, { status: 500 });

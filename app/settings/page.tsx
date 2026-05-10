@@ -6,6 +6,7 @@ import { useSupabase } from '@/lib/SupabaseProvider'
 import { useTheme } from '@/lib/ThemeProvider'
 import { useToast } from '@/lib/ToastProvider'
 import Header from '@/components/Header'
+import { extractPublicIdFromUrl } from '@/lib/cloudinary'
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -60,7 +61,7 @@ export default function SettingsPage() {
         
         if (photos && photos.length > 0) {
           await Promise.all(photos.map(async (photo) => {
-            const publicId = photo.image_url.split('/').pop()?.split('.')[0];
+            const publicId = extractPublicIdFromUrl(photo.image_url);
             if (publicId) {
               await fetch('/api/cloudinary/delete', {
                 method: 'POST',

@@ -45,17 +45,32 @@ export default function EditProfilePage() {
   }, [id, supabase, router])
 
   const handleUpload = async (file: File) => {
-    if (!CLOUDINARY_CLOUD_NAME) return
+    if (!CLOUDINARY_CLOUD_NAME) {
+      alert("Erro de configuração: Cloud Name não encontrado.")
+      return
+    }
+    
     const formData = new FormData()
     formData.append('file', file)
     formData.append('upload_preset', 'miphobook_unsigned_upload')
 
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
-      method: 'POST',
-      body: formData
-    })
-    const data = await res.json()
-    return data.secure_url
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData
+      })
+      const data = await res.json()
+      
+      if (data.error) {
+        throw new Error(data.error.message)
+      }
+      
+      return data.secure_url
+    } catch (err: any) {
+      console.error("Erro no upload do perfil:", err)
+      alert("Erro ao carregar imagem: " + (err.message || "Erro desconhecido"))
+      return null
+    }
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -107,7 +122,12 @@ export default function EditProfilePage() {
             <span className="meta">Banner do Perfil</span>
             <div className="card-border" style={{ height: '120px', backgroundColor: 'var(--border)', position: 'relative', overflow: 'hidden' }}>
               {bannerUrl && <img src={bannerUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-              <input type="file" accept="image/*" onChange={async (e) => { if(e.target.files?.[0]) setBannerUrl(await handleUpload(e.target.files[0])) }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+              <input type="file" accept="image/*" onChange={async (e) => { 
+                if(e.target.files?.[0]) {
+                  const url = await handleUpload(e.target.files[0]);
+                  if (url) setBannerUrl(url);
+                }
+              }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
               <div style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'var(--bg)', padding: '4px 8px', fontSize: '9px', fontWeight: '900', border: '1px solid var(--border)' }}>ALTERAR BANNER</div>
             </div>
           </div>
@@ -115,11 +135,16 @@ export default function EditProfilePage() {
           {/* AVATAR EDIT */}
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
             <div className="card-border" style={{ width: '80px', height: '80px', backgroundColor: 'var(--bg)', overflow: 'hidden', flexShrink: 0 }}>
-              {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined">person</span></div>}
+              {avatarUrl ? <img src={avatarUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span className="material-symbols-outlined">person</span></div>}
             </div>
             <div style={{ position: 'relative' }}>
                <button type="button" style={{ height: '30px', fontSize: '10px' }}>ALTERAR FOTO</button>
-               <input type="file" accept="image/*" onChange={async (e) => { if(e.target.files?.[0]) setAvatarUrl(await handleUpload(e.target.files[0])) }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+               <input type="file" accept="image/*" onChange={async (e) => { 
+                 if(e.target.files?.[0]) {
+                   const url = await handleUpload(e.target.files[0]);
+                   if (url) setAvatarUrl(url);
+                 }
+               }} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
             </div>
           </div>
 

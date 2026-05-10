@@ -7,7 +7,7 @@ import { useToast } from '@/lib/ToastProvider'
 import Header from '@/components/Header'
 import Skeleton from '@/components/Skeleton'
 import FormattedText from '@/components/FormattedText'
-import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, extractPublicIdFromUrl } from '@/lib/cloudinary'
 
 interface PhotoGroup {
   id: string; 
@@ -180,12 +180,15 @@ export default function PhotobookDetailPage() {
   const handleDeletePhoto = async (photoId: string, imageUrl: string) => {
     if (!supabase || !window.confirm("Apagar foto?")) return
     try {
-      const publicId = imageUrl.split('/').pop()?.split('.')[0]
+      const publicId = extractPublicIdFromUrl(imageUrl)
       if (publicId) await fetch('/api/cloudinary/delete', { method: 'POST', body: JSON.stringify({ publicId }) })
       await supabase.from('photos').delete().eq('id', photoId)
       fetchPhotobookDetails()
       toast('Foto removida.', 'success')
-    } catch (err) { toast('Erro ao apagar.', 'error') }
+    } catch (err) { 
+      console.error(err)
+      toast('Erro ao apagar.', 'error') 
+    }
   }
 
   const isOwner = currentUser && photobook && currentUser.id === photobook.user_id
@@ -251,13 +254,32 @@ export default function PhotobookDetailPage() {
         </header>
 
         {/* TIMELINE */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '100px' }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '100px',
+          position: 'relative',
+          paddingLeft: '20px',
+          borderLeft: '1px solid var(--border)'
+        }}>
           {photoGroups.map((group) => {
             const isSingle = group.photos.length === 1;
             const isDouble = group.photos.length === 2;
             
             return (
-              <article key={group.id} style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+              <article key={group.id} style={{ display: 'flex', flexDirection: 'column', gap: '30px', position: 'relative' }}>
+                {/* Timeline Dot */}
+                <div style={{
+                  position: 'absolute',
+                  left: '-26px',
+                  top: '0',
+                  width: '11px',
+                  height: '11px',
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--text)',
+                  border: '3px solid var(--bg)',
+                  zIndex: 2
+                }} />
                 
                 <div style={{ 
                   display: 'grid', 

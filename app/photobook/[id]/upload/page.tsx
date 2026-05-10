@@ -38,8 +38,14 @@ export default function UploadPhotoPage() {
     setLoading(true)
     setUploadProgress({ current: 0, total: selectedFiles.length })
 
-    if (!supabase || !id || selectedFiles.length === 0 || !CLOUDINARY_CLOUD_NAME) {
-      setMessage('Verifique as configurações e selecione arquivos.')
+    if (!supabase || !id || selectedFiles.length === 0) {
+      setMessage('Selecione arquivos para enviar.')
+      setLoading(false)
+      return
+    }
+
+    if (!CLOUDINARY_CLOUD_NAME) {
+      setMessage('Erro de configuração: Cloud Name não encontrado.')
       setLoading(false)
       return
     }

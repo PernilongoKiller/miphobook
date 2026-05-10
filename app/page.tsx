@@ -10,6 +10,7 @@ import Sidebar from '@/components/Sidebar'
 import MomentCard from '@/components/MomentCard'
 import PostCard from '@/components/PostCard'
 import PostComposer from '@/components/PostComposer'
+import MemoryPrompt from '@/components/MemoryPrompt'
 import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'explore' | 'feed' | 'following' | 'trending'>('explore')
   const [photobooks, setPhotobooks] = useState<any[]>([])
   const [feedItems, setFeedItems] = useState<any[]>([])
+  const [composerPrefill, setComposerPrefill] = useState('')
 
   const fetchTrendingFeed = useCallback(async () => {
     if (!supabase) return
@@ -395,7 +397,14 @@ export default function Home() {
           )}
 
           {activeTab === 'feed' && user && (
-            <PostComposer onPostCreated={fetchGlobalFeed} />
+            <>
+              <MemoryPrompt onSelectPrompt={(prompt) => {
+                setComposerPrefill(`**${prompt}**\n`);
+                // Scroll suave para o compositor (opcional)
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }} />
+              <PostComposer onPostCreated={fetchGlobalFeed} prefilledContent={composerPrefill} />
+            </>
           )}
 
           {loading ? (

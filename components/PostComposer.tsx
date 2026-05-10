@@ -1,32 +1,45 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
 import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
-export default function PostComposer({ onPostCreated }: { onPostCreated: () => void }) {
+export default function PostComposer({ onPostCreated, prefilledContent = '' }: { onPostCreated: () => void, prefilledContent?: string }) {
   const supabase = useSupabase()
   const { user } = useUser()
   const { toast } = useToast()
   
-  const [content, setContent] = useState('')
+  const [content, setContent] = useState(prefilledContent)
   const [image, setImage] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isPosting, setIsPosting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  useEffect(() => {
+    if (prefilledContent) {
+      setContent(prev => prev ? prev + '\n\n' + prefilledContent : prefilledContent)
+    }
+  }, [prefilledContent])
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+    if (!cloudName) {
+      toast('Erro de configuração: Cloud Name não encontrado.', 'error')
+      return
+    }
 
     setIsUploading(true)
     const formData = new FormData()
     formData.append('file', file)
     formData.append('upload_preset', 'miphobook_unsigned_upload')
+    formData.append('cloud_name', cloudName)
 
     try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: 'POST',
         body: formData
       })
@@ -40,7 +53,7 @@ export default function PostComposer({ onPostCreated }: { onPostCreated: () => v
       setImage(data.secure_url)
     } catch (err: any) {
       console.error("Erro upload Cloudinary:", err)
-      toast(`Erro ao carregar imagem: ${err.message || 'Erro desconhecido'}`, 'error')
+      toast(`Erro ao carregar imagem: ${err.message || 'Erro de conexão'}`, 'error')
     } finally {
       setIsUploading(false)
     }

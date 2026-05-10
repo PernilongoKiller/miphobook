@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabase, useUser } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
-import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
+import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR, extractPublicIdFromUrl } from '@/lib/cloudinary'
 import FormattedText from '@/components/FormattedText'
 
 interface PostCardProps {
@@ -51,15 +51,20 @@ export default function PostCard({ post }: PostCardProps) {
     try {
       // 1. Se tiver imagem, apagar do Cloudinary
       if (post.image_url && post.image_url.includes('cloudinary.com')) {
-        const parts = post.image_url.split('/')
-        const fileName = parts[parts.length - 1]
-        const publicId = fileName.split('.')[0]
+        const publicId = extractPublicIdFromUrl(post.image_url)
         
         if (publicId) {
-          await fetch('/api/cloudinary/delete', {
+          const res = await fetch('/api/cloudinary/delete', {
             method: 'POST',
             body: JSON.stringify({ publicId })
           })
+          
+          if (!res.ok) {
+            const errorData = await res.json()
+            console.warn('Falha ao apagar imagem do Cloudinary:', errorData.error)
+            // Continuamos a apagar do Supabase mesmo se falhar no Cloudinary
+            // para não deixar o post "preso", mas avisamos no console.
+          }
         }
       }
 
