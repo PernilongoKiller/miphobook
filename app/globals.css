@@ -1,27 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;900&family=Alfa+Slab+One&display=swap');
 
 :root {
-  --bg-rgb: 253, 250, 246;
-  --bg: #fdfaf6; /* Um creme quente (Linen/Antique) */
+  --bg-rgb: 255, 255, 255;
+  --bg: #ffffff;
   --card-bg: #ffffff;
-  --text: #2c2c2c; /* Um cinza muito escuro, menos agressivo que o preto puro */
-  --muted: #8c857d; /* Um tom de terra suave */
-  --border: #e8e2d9; /* Borda mais quente */
-  --accent: #5d5c58; /* Um cinza carvão quente para acentos */
+  --text: #1a1a1a;
+  --muted: #737373;
+  --border: #efefef;
+  --accent: #000000;
   --radius: 12px;
   --radius-sm: 4px;
-  --shadow: 0 2px 15px rgba(0,0,0,0.03);
+  --shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 [data-theme="dark"] {
-  --bg-rgb: 26, 26, 24;
-  --bg: #1a1a18; /* Um preto quente (Eerie Black) */
-  --card-bg: #21211f;
-  --text: #e8e2d9;
-  --muted: #8c857d;
-  --border: #33312e;
-  --accent: #d4a373; /* Um tom de couro/terra para destaque no escuro */
-  --shadow: 0 2px 15px rgba(0,0,0,0.2);
+  --bg-rgb: 0, 0, 0;
+  --bg: #000000;
+  --card-bg: #121212;
+  --text: #f5f5f5;
+  --muted: #a8a8a8;
+  --border: #262626;
+  --accent: #ffffff;
+  --shadow: 0 4px 12px rgba(255,255,255,0.05);
 }
 
 body {
@@ -35,7 +35,7 @@ body {
   min-height: 100vh;
 }
 
-/* Texture Overlay (Grain) */
+/* Texture Overlay (Grain) - Reduced opacity for a cleaner look */
 body::before {
   content: "";
   position: fixed;
@@ -43,10 +43,10 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.04;
+  opacity: 0.02;
   pointer-events: none;
   z-index: 9999;
-  background-image: url("https://www.transparenttextures.com/patterns/stardust.png"); /* Efeito granulado sutil */
+  background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
 }
 
 /* Ambient Blur Elements (Refined) */

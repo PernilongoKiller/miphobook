@@ -68,7 +68,10 @@ export default function PostCard({ post }: PostCardProps) {
         }
       }
 
-      // 2. Apagar do Supabase
+      // 2. Apagar curtidas vinculadas (evitar erro de chave estrangeira)
+      await supabase.from('post_likes').delete().eq('post_id', post.id)
+
+      // 3. Apagar do Supabase
       const { error } = await supabase.from('posts').delete().eq('id', post.id)
       
       if (error) throw error

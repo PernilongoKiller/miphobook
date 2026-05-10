@@ -182,6 +182,13 @@ export default function PhotobookDetailPage() {
     try {
       const publicId = extractPublicIdFromUrl(imageUrl)
       if (publicId) await fetch('/api/cloudinary/delete', { method: 'POST', body: JSON.stringify({ publicId }) })
+      
+      // Apagar curtidas e comentários da foto (evitar erro de chave estrangeira)
+      await Promise.all([
+        supabase.from('photo_likes').delete().eq('photo_id', photoId),
+        supabase.from('photo_comments').delete().eq('photo_id', photoId)
+      ])
+
       await supabase.from('photos').delete().eq('id', photoId)
       fetchPhotobookDetails()
       toast('Foto removida.', 'success')
