@@ -8,6 +8,8 @@ import Skeleton from '@/components/Skeleton'
 import PostCard from '@/components/PostCard'
 import MomentCard from '@/components/MomentCard'
 import FormattedText from '@/components/FormattedText'
+import MuralGrid from '@/components/MuralGrid'
+import MuralItemForm from '@/components/MuralItemForm'
 import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
 export default function UserProfilePage() {
@@ -20,12 +22,26 @@ export default function UserProfilePage() {
   const [photobooks, setPhotobooks] = useState<any[]>([])
   const [moments, setMoments] = useState<any[]>([])
   const [posts, setPosts] = useState<any[]>([])
-  const [activeTab, setActiveTab] = useState<'books' | 'moments' | 'posts'>('books')
+  const [muralItems, setMuralItems] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState<'mural' | 'books' | 'moments' | 'posts'>('mural')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isAddingToMural, setIsAddingToMural] = useState(false)
 
   const [social, setSocial] = useState({ isFollowing: false, followers: 0, following: 0 })
   const [followLoading, setFollowLoading] = useState(false)
+
+  const fetchMuralItems = useCallback(async () => {
+    if (!supabase || !id) return
+    try {
+      const { data } = await supabase
+        .from('mural_items')
+        .select('*')
+        .eq('user_id', id)
+        .order('created_at', { ascending: false })
+      setMuralItems(data || [])
+    } catch (err) { console.error(err) }
+  }, [supabase, id])
 
   const fetchPosts = useCallback(async () => {
     if (!supabase || !id) return
@@ -126,6 +142,7 @@ export default function UserProfilePage() {
         isFollowing: (isFollowingRes.status === 'fulfilled' ? !!isFollowingRes.value.data : false)
       })
 
+      fetchMuralItems()
       fetchMoments()
       fetchPosts()
     } catch (err: any) {
@@ -134,7 +151,7 @@ export default function UserProfilePage() {
     } finally {
       setLoading(false)
     }
-  }, [supabase, id, currentUser, fetchMoments, fetchPosts])
+  }, [supabase, id, currentUser, fetchMuralItems, fetchMoments, fetchPosts])
 
   useEffect(() => {
     fetchData()
@@ -274,7 +291,18 @@ export default function UserProfilePage() {
         </div>
 
         {/* ABAS */}
-        <div style={{ display: 'flex', gap: '30px', borderBottom: '2px solid var(--border)', marginBottom: '30px' }}>
+        <div style={{ display: 'flex', gap: '30px', borderBottom: '2px solid var(--border)', marginBottom: '30px', alignItems: 'center' }}>
+          <button 
+            onClick={() => setActiveTab('mural')}
+            style={{ 
+              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
+              color: activeTab === 'mural' ? 'var(--text)' : 'var(--muted)',
+              borderBottom: activeTab === 'mural' ? '2px solid var(--text)' : 'none',
+              borderRadius: 0, fontSize: '11px', fontWeight: '800'
+            }}
+          >
+            MURAL
+          </button>
           <button 
             onClick={() => setActiveTab('books')}
             style={{ 
@@ -308,10 +336,45 @@ export default function UserProfilePage() {
           >
             POSTS
           </button>
+
+          <div style={{ flexGrow: 1 }} />
+          
+          {isOwner && activeTab === 'mural' && (
+            <button 
+              onClick={() => setIsAddingToMural(true)}
+              style={{ fontSize: '10px', height: '28px', padding: '0 12px' }}
+            >
+              PRENDER NO MURAL
+            </button>
+          )}
         </div>
 
         {/* CONTEÚDO DAS ABAS */}
-        {activeTab === 'books' ? (
+        {activeTab === 'mural' ? (
+          <div>
+            {isAddingToMural && (
+               <MuralItemForm 
+                 onClose={() => setIsAddingToMural(false)} 
+                 onSuccess={() => { setIsAddingToMural(false); fetchMuralItems(); }}
+               />
+            )}
+            {muralItems.length > 0 ? (
+              <MuralGrid 
+                items={muralItems} 
+                isOwner={isOwner} 
+                onItemDeleted={(itemId) => setMuralItems(prev => prev.filter(i => i.id !== itemId))} 
+              />
+            ) : (
+              <div style={{ textAlign: 'center', padding: '100px 20px', border: '2px dashed var(--border)', borderRadius: 'var(--radius)' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--border)', marginBottom: '15px' }}>view_quilt</span>
+                <p className="meta">O mural está vazio. Que tal prender algo aqui?</p>
+                {isOwner && (
+                  <button onClick={() => setIsAddingToMural(true)} style={{ marginTop: '20px' }}>ADICIONAR ITEM</button>
+                )}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'books' ? (
           <div className="responsive-grid">
             {photobooks.map((pb) => {
               const cover = pb.photos?.[0]?.image_url;
