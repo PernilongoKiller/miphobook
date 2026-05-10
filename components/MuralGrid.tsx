@@ -145,18 +145,23 @@ export default function MuralGrid({ items, isOwner, onItemDeleted }: MuralGridPr
           opacity: 1;
         }
 
+        /* Estilo Texto (Diário/Post-it) */
         .mural-item-text {
-          padding: 20px;
-          background-color: #fffdf2;
-          border-bottom: 2px solid rgba(0,0,0,0.05);
-          transform: rotate(-1deg);
-          color: #1a1a1a; /* Garante texto escuro no papel claro */
+          padding: 24px;
+          background-color: var(--card-bg);
+          border: 1px solid var(--border);
+          color: var(--text);
+          transform: rotate(-0.5deg);
         }
         
         [data-theme="dark"] .mural-item-text {
-          background-color: #242420;
-          color: #e8e2d9;
-          border-color: #333;
+          background-color: var(--card-bg);
+          color: var(--text);
+          border-color: var(--border);
+        }
+
+        .mural-content-text {
+          color: var(--text) !important;
         }
 
         .mural-title {
