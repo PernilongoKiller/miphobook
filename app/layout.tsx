@@ -8,7 +8,7 @@ export const metadata = {
   title: "miphobook",
   description: "Nem toda foto é só uma imagem.",
   icons: {
-    icon: '/logo.svg',
+    icon: '/favicon.svg',
   },
   // Injetando o CSS das fontes de forma oficial via metadados
   other: {
