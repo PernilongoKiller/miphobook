@@ -5,10 +5,45 @@ import { ToastProvider } from "@/lib/ToastProvider";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "miphobook",
-  description: "Nem toda foto é só uma imagem.",
+  title: {
+    default: "Miphobook | Nem toda foto é só uma imagem",
+    template: "%s | Miphobook"
+  },
+  description: "Miphobook: Onde nem toda foto é só uma imagem. Um espaço aconchegante para criar photobooks e compartilhar as histórias reais por trás dos seus momentos.",
+  keywords: ["photobook", "memórias", "álbum de fotos", "storytelling", "fotografia", "diário visual", "miphobook"],
+  authors: [{ name: "PernilongoKiller" }],
+  creator: "PernilongoKiller",
+  publisher: "Miphobook",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   icons: {
     icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
+  openGraph: {
+    title: "Miphobook | Sua jornada em memórias",
+    description: "Compartilhe as histórias por trás das suas fotos em um espaço feito para durar.",
+    url: "https://miphobook.vercel.app",
+    siteName: "Miphobook",
+    images: [
+      {
+        url: "/logo.svg",
+        width: 800,
+        height: 600,
+      },
+    ],
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Miphobook | Sua jornada em memórias",
+    description: "Um hub de memórias e momentos focado em contar histórias.",
+    images: ["/logo.svg"],
   },
   // Injetando o CSS das fontes de forma oficial via metadados
   other: {
