@@ -168,7 +168,7 @@ export default function Header() {
             <>
               <div ref={notifRef} style={{ position: 'relative' }}>
                 <button onClick={() => { setShowNotifications(!showNotifications); markAsRead(); }} style={iconButtonStyle}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>notifications</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>notifications</span>
                   {unreadCount > 0 && <span style={{ position: 'absolute', top: '6px', right: '6px', width: '8px', height: '8px', backgroundColor: '#ed4956', borderRadius: '50%', border: '2px solid var(--bg)' }}></span>}
                 </button>
                 {showNotifications && (
@@ -208,11 +208,12 @@ export default function Header() {
                   </div>
                 )}
               </div>
-              <button onClick={toggleTheme} style={iconButtonStyle}>
-                <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
+              <button onClick={toggleTheme} className="hide-on-mobile" style={iconButtonStyle}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
               </button>
               <div 
                 onClick={() => router.push(`/profile/${userId}`)}
+                className="hide-on-mobile"
                 style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden', border: '1px solid var(--border)', backgroundColor: 'var(--border)', marginLeft: '8px' }}
               >
                 <img 

@@ -107,6 +107,10 @@ body::after {
   min-height: 100vh;
 }
 
+.mobile-bottom-nav {
+  display: none; /* Escondido por padrão no desktop */
+}
+
 .left-column {
   position: sticky;
   top: 80px;
@@ -148,7 +152,16 @@ body::after {
 }
 
 .nav-item i, .nav-item span {
-  font-size: 24px;
+  font-size: 20px; /* Reduzido de 24px para ser mais elegante */
+}
+
+/* CLASSES DE VISIBILIDADE */
+.hide-on-mobile {
+  display: flex !important;
+}
+
+.hide-on-desktop {
+  display: none !important;
 }
 
 /* GRID E CONTAINER CENTRALIZADO */
@@ -162,8 +175,8 @@ body::after {
 
 .responsive-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 40px 30px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 30px 20px;
 }
 
 /* ESTILO BOOK-CARD (LIVRO) - IDENTIDADE MIPHOBOOK */
@@ -171,12 +184,15 @@ body::after {
   position: relative;
   aspect-ratio: 1 / 1.4; 
   background-color: var(--card-bg);
+  background-image: radial-gradient(var(--border) 0.5px, transparent 0.5px); /* Sutil granulação */
+  background-size: 3px 3px;
   border: 1px solid var(--border);
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
 }
 
 /* Marca-página (Bookmark) */
@@ -184,22 +200,23 @@ body::after {
   content: "";
   position: absolute;
   top: 0;
-  right: 20px;
-  width: 10px;
-  height: 30px;
+  right: 15px;
+  width: 8px;
+  height: 25px;
   background-color: var(--text);
   z-index: 1;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 0 0 2px 2px;
+  border-radius: 0 0 1px 1px;
 }
 
 .book-card:hover::after {
-  transform: translateY(-15px);
+  transform: translateY(-12px);
 }
 
 .book-card:hover {
   border-color: var(--text);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transform: translateY(-5px);
+  box-shadow: 10px 10px 30px rgba(0,0,0,0.1);
 }
 
 /* Lombada técnica */
@@ -209,12 +226,12 @@ body::after {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 12px; 
+  width: 15px; 
   background: linear-gradient(to right, 
-    rgba(0,0,0,0.1) 0%, 
-    rgba(0,0,0,0.05) 50%,
+    rgba(0,0,0,0.12) 0%, 
+    rgba(0,0,0,0.06) 50%,
     transparent 100%);
-  border-right: 1px solid rgba(0,0,0,0.05);
+  border-right: 1px solid rgba(0,0,0,0.08);
   z-index: 10;
 }
 
@@ -224,7 +241,7 @@ body::after {
   align-items: center;
   justify-content: center;
   background-color: var(--card-bg);
-  padding: 30px 20px 10px 30px; /* Espaço para a lombada */
+  padding: 25px 15px 10px 30px; /* Mais recuo para a lombada */
   position: relative;
 }
 
@@ -232,13 +249,13 @@ body::after {
   width: 100%;
   height: 100%;
   border: 1px solid var(--border);
-  padding: 5px;
+  padding: 4px;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 [data-theme="dark"] .book-cover-photo-wrapper {
@@ -253,7 +270,7 @@ body::after {
 }
 
 .book-info {
-  padding: 10px 15px 20px 30px;
+  padding: 10px 10px 20px 30px;
   background: var(--card-bg);
   z-index: 5;
   text-align: center;
@@ -261,19 +278,19 @@ body::after {
 
 .book-title {
   font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
   margin: 0 0 4px 0;
-  line-height: 1.4;
+  line-height: 1.3;
   color: var(--text);
 }
 
 @media (max-width: 1100px) {
   .app-layout {
     grid-template-columns: 80px 1fr;
-    max-width: 800px;
+    max-width: 900px;
   }
   .right-column {
     display: none;
@@ -281,12 +298,27 @@ body::after {
   .nav-text {
     display: none;
   }
+  .left-column {
+    width: 80px;
+  }
 }
 
 @media (max-width: 768px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
+  .hide-on-desktop {
+    display: flex !important;
+  }
+
   .app-layout {
     display: block;
     padding: 0;
+  }
+  .responsive-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px 15px;
+    padding: 10px;
   }
   .left-column {
     display: none;
