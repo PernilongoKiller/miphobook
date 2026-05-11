@@ -216,7 +216,7 @@ export default function Header() {
                 style={{ width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', overflow: 'hidden', border: '1px solid var(--border)', backgroundColor: 'var(--border)', marginLeft: '8px' }}
               >
                 <img 
-                  src={user.user_metadata?.avatar_url ? getOptimizedCloudinaryUrl(user.user_metadata.avatar_url, { width: 64, height: 64 }) : DEFAULT_AVATAR} 
+                  src={user?.user_metadata?.avatar_url ? getOptimizedCloudinaryUrl(user.user_metadata.avatar_url, { width: 64, height: 64 }) : DEFAULT_AVATAR} 
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                   alt="Me"
                 />
