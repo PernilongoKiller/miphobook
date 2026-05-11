@@ -12,6 +12,9 @@ import MuralGrid from '@/components/MuralGrid'
 import MuralItemForm from '@/components/MuralItemForm'
 import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
+import Navigation from '@/components/Navigation'
+import Sidebar from '@/components/Sidebar'
+
 export default function UserProfilePage() {
   const router = useRouter()
   const { id } = useParams()
@@ -176,26 +179,31 @@ export default function UserProfilePage() {
   if (loading) return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Header />
-      <main className="main-container">
-        <Skeleton height="200px" width="100%" style={{ marginBottom: '20px' }} />
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-          <Skeleton width="100px" height="100px" />
-          <Skeleton width="200px" height="40px" />
-        </div>
-        <div className="responsive-grid">
-           {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} height="240px" width="100%" />)}
-        </div>
-      </main>
+      <div className="app-layout">
+        <Navigation />
+        <main className="main-feed">
+          <Skeleton height="200px" width="100%" style={{ marginBottom: '20px' }} />
+          <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
+            <Skeleton width="100px" height="100px" />
+            <Skeleton width="200px" height="40px" />
+          </div>
+        </main>
+        <Sidebar />
+      </div>
     </div>
   )
 
   if (error || !profile) return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
-      <main className="main-container" style={{ textAlign: 'center', paddingTop: '100px' }}>
-        <p className="meta">{error || "Não encontrado"}</p>
-        <button onClick={() => router.push('/')} style={{ marginTop: '20px' }}>Voltar</button>
-      </main>
+      <div className="app-layout">
+        <Navigation />
+        <main className="main-feed" style={{ textAlign: 'center', paddingTop: '100px' }}>
+          <p className="meta">{error || "Não encontrado"}</p>
+          <button onClick={() => router.push('/')} style={{ marginTop: '20px' }}>Voltar</button>
+        </main>
+        <Sidebar />
+      </div>
     </div>
   )
 
@@ -203,232 +211,173 @@ export default function UserProfilePage() {
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main className="main-container">
-        
-        {/* Banner Noir */}
-        <div style={{ 
-          width: '100%', 
-          height: '200px', 
-          backgroundColor: 'var(--border)', 
-          overflow: 'hidden', 
-          marginBottom: '25px',
-          borderRadius: 'var(--radius)',
-          border: '1px solid var(--border)'
-        }}>
-          {profile.banner_url && (
-            <img 
-              src={getOptimizedCloudinaryUrl(profile.banner_url, { width: 1200, quality: '80' })} 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-              loading="lazy"
-            />
-          )}
-        </div>
+      <div className="app-layout">
+        <Navigation />
 
-        {/* Informações do Perfil */}
-        <div style={{ paddingBottom: '40px', marginBottom: '40px' }}>
-          <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-            
-            {/* Avatar Arredondado */}
-            <div style={{ 
-              width: '120px', 
-              height: '120px', 
-              backgroundColor: 'var(--card-bg)', 
-              flexShrink: 0, 
-              borderRadius: '50%', 
-              border: '4px solid var(--card-bg)',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              overflow: 'hidden',
-              marginTop: '-60px',
-              marginLeft: '20px',
-              position: 'relative',
-              zIndex: 5
-            }}>
+        <main className="main-feed">
+          
+          {/* Banner Noir */}
+          <div style={{ 
+            width: '100%', 
+            height: '160px', 
+            backgroundColor: 'var(--border)', 
+            overflow: 'hidden', 
+            marginBottom: '20px',
+            borderRadius: 'var(--radius)',
+            border: '1px solid var(--border)'
+          }}>
+            {profile.banner_url && (
               <img 
-                src={profile.avatar_url ? getOptimizedCloudinaryUrl(profile.avatar_url, { width: 240, height: 240 }) : DEFAULT_AVATAR} 
+                src={getOptimizedCloudinaryUrl(profile.banner_url, { width: 1200, quality: '80' })} 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 loading="lazy"
-                alt="Avatar"
               />
-            </div>
-
-            <div style={{ flexGrow: 1, minWidth: '250px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '20px', marginBottom: '15px' }}>
-                <h2 style={{ fontSize: '28px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '-1px' }}>{profile.username}</h2>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  {isOwner ? (
-                    <button onClick={() => router.push(`/profile/${id}/edit`)} style={{ height: '32px', fontSize: '10px' }}>EDITAR PERFIL</button>
-                  ) : (
-                    <button onClick={handleFollow} disabled={followLoading} style={{ height: '32px', fontSize: '10px', backgroundColor: social.isFollowing ? 'transparent' : 'var(--text)', color: social.isFollowing ? 'var(--text)' : 'var(--bg)' }}>
-                      {social.isFollowing ? 'SEGUINDO' : 'SEGUIR'}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-                <span className="meta">{social.followers} SEGUIDORES</span>
-                <span className="meta">{social.following} SEGUINDO</span>
-                <span className="meta">{photobooks.length} ÁLBUNS</span>
-              </div>
-
-              {profile.bio && (
-                <p style={{ fontSize: '13px', lineHeight: '1.4', marginBottom: '20px', maxWidth: '600px' }}>
-                  <FormattedText text={profile.bio} />
-                </p>
-              )}
-
-              {profile.links && profile.links.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-                  {profile.links.map((link: any, i: number) => (
-                    <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="meta" style={{ textDecoration: 'underline', color: 'var(--text)' }}>
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ABAS */}
-        <div style={{ display: 'flex', gap: '30px', borderBottom: '2px solid var(--border)', marginBottom: '30px', alignItems: 'center' }}>
-          <button 
-            onClick={() => setActiveTab('mural')}
-            style={{ 
-              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
-              color: activeTab === 'mural' ? 'var(--text)' : 'var(--muted)',
-              borderBottom: activeTab === 'mural' ? '2px solid var(--text)' : 'none',
-              borderRadius: 0, fontSize: '11px', fontWeight: '800'
-            }}
-          >
-            MURAL
-          </button>
-          <button 
-            onClick={() => setActiveTab('books')}
-            style={{ 
-              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
-              color: activeTab === 'books' ? 'var(--text)' : 'var(--muted)',
-              borderBottom: activeTab === 'books' ? '2px solid var(--text)' : 'none',
-              borderRadius: 0, fontSize: '11px', fontWeight: '800'
-            }}
-          >
-            ÁLBUNS
-          </button>
-          <button 
-            onClick={() => setActiveTab('moments')}
-            style={{ 
-              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
-              color: activeTab === 'moments' ? 'var(--text)' : 'var(--muted)',
-              borderBottom: activeTab === 'moments' ? '2px solid var(--text)' : 'none',
-              borderRadius: 0, fontSize: '11px', fontWeight: '800'
-            }}
-          >
-            MOMENTOS
-          </button>
-          <button 
-            onClick={() => setActiveTab('posts')}
-            style={{ 
-              border: 'none', padding: '15px 0', backgroundColor: 'transparent', 
-              color: activeTab === 'posts' ? 'var(--text)' : 'var(--muted)',
-              borderBottom: activeTab === 'posts' ? '2px solid var(--text)' : 'none',
-              borderRadius: 0, fontSize: '11px', fontWeight: '800'
-            }}
-          >
-            POSTS
-          </button>
-
-          <div style={{ flexGrow: 1 }} />
-          
-          {isOwner && activeTab === 'mural' && (
-            <button 
-              onClick={() => setIsAddingToMural(true)}
-              style={{ fontSize: '10px', height: '28px', padding: '0 12px' }}
-            >
-              PRENDER NO MURAL
-            </button>
-          )}
-        </div>
-
-        {/* CONTEÚDO DAS ABAS */}
-        {activeTab === 'mural' ? (
-          <div>
-            {isAddingToMural && (
-               <MuralItemForm 
-                 onClose={() => setIsAddingToMural(false)} 
-                 onSuccess={() => { setIsAddingToMural(false); fetchMuralItems(); }}
-               />
             )}
-            {muralItems.length > 0 ? (
-              <MuralGrid 
-                items={muralItems} 
-                isOwner={isOwner} 
-                onItemDeleted={(itemId) => setMuralItems(prev => prev.filter(i => i.id !== itemId))} 
-              />
-            ) : (
-              <div style={{ textAlign: 'center', padding: '100px 20px', border: '2px dashed var(--border)', borderRadius: 'var(--radius)' }}>
-                <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--border)', marginBottom: '15px' }}>view_quilt</span>
-                <p className="meta">O mural está vazio. Que tal prender algo aqui?</p>
-                {isOwner && (
-                  <button onClick={() => setIsAddingToMural(true)} style={{ marginTop: '20px' }}>ADICIONAR ITEM</button>
+          </div>
+
+          {/* Informações do Perfil */}
+          <div style={{ paddingBottom: '30px', marginBottom: '30px', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+              
+              <div style={{ 
+                width: '100px', 
+                height: '100px', 
+                backgroundColor: 'var(--card-bg)', 
+                flexShrink: 0, 
+                borderRadius: '50%', 
+                border: '4px solid var(--card-bg)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                overflow: 'hidden',
+                marginTop: '-50px',
+                marginLeft: '15px',
+                position: 'relative',
+                zIndex: 5
+              }}>
+                <img 
+                  src={profile.avatar_url ? getOptimizedCloudinaryUrl(profile.avatar_url, { width: 200, height: 200 }) : DEFAULT_AVATAR} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                  loading="lazy"
+                  alt="Avatar"
+                />
+              </div>
+
+              <div style={{ flexGrow: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '15px', marginBottom: '10px' }}>
+                  <h2 style={{ fontSize: '22px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>{profile.username}</h2>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {isOwner ? (
+                      <button onClick={() => router.push(`/profile/${id}/edit`)} style={{ padding: '6px 16px', fontSize: '10px' }}>EDITAR</button>
+                    ) : (
+                      <button onClick={handleFollow} disabled={followLoading} className="button-primary" style={{ padding: '6px 16px', fontSize: '10px', backgroundColor: social.isFollowing ? 'transparent' : 'var(--text)', color: social.isFollowing ? 'var(--text)' : 'var(--bg)' }}>
+                        {social.isFollowing ? 'SEGUINDO' : 'SEGUIR'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                  <span className="meta" style={{ fontSize: '10px' }}>{social.followers} SEGUIDORES</span>
+                  <span className="meta" style={{ fontSize: '10px' }}>{social.following} SEGUINDO</span>
+                  <span className="meta" style={{ fontSize: '10px' }}>{photobooks.length} ÁLBUNS</span>
+                </div>
+
+                {profile.bio && (
+                  <p style={{ fontSize: '13px', lineHeight: '1.4', marginBottom: '15px' }}>
+                    <FormattedText text={profile.bio} />
+                  </p>
                 )}
               </div>
-            )}
+            </div>
           </div>
-        ) : activeTab === 'books' ? (
-          <div className="responsive-grid">
-            {photobooks.map((pb) => {
-              const cover = pb.photos?.[0]?.image_url;
-              return (
-                <div 
-                  key={pb.id} 
-                  className="book-card" 
-                  onClick={() => router.push(`/photobook/${pb.id}`)}
-                >
-                  <div className="book-cover">
-                    <div className="book-cover-photo-wrapper">
-                      {cover ? (
-                        <img src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400 })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
-                      ) : (
-                        <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--border)' }}>photo_library</span>
-                        </div>
-                      )}
+
+          {/* ABAS */}
+          <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--border)', marginBottom: '24px', overflowX: 'auto', paddingBottom: '1px' }}>
+            {['mural', 'books', 'moments', 'posts'].map((tab) => (
+              <button 
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                style={{ 
+                  border: 'none', padding: '12px 0', backgroundColor: 'transparent', 
+                  color: activeTab === tab ? 'var(--text)' : 'var(--muted)',
+                  borderBottom: activeTab === tab ? '2px solid var(--text)' : 'none',
+                  borderRadius: 0, fontSize: '10px', fontWeight: '800', whiteSpace: 'nowrap'
+                }}
+              >
+                {tab.toUpperCase()}
+              </button>
+            ))}
+          </div>
+
+          {/* CONTEÚDO DAS ABAS */}
+          {activeTab === 'mural' ? (
+            <div>
+              {isAddingToMural && (
+                 <MuralItemForm 
+                   onClose={() => setIsAddingToMural(false)} 
+                   onSuccess={() => { setIsAddingToMural(false); fetchMuralItems(); }}
+                 />
+              )}
+              {muralItems.length > 0 ? (
+                <MuralGrid 
+                  items={muralItems} 
+                  isOwner={isOwner} 
+                  onItemDeleted={(itemId) => setMuralItems(prev => prev.filter(i => i.id !== itemId))} 
+                />
+              ) : (
+                <div style={{ textAlign: 'center', padding: '60px 20px', border: '1px dashed var(--border)', borderRadius: 'var(--radius)' }}>
+                  <p className="meta" style={{ fontSize: '11px' }}>O mural está vazio.</p>
+                  {isOwner && (
+                    <button onClick={() => setIsAddingToMural(true)} style={{ marginTop: '16px', fontSize: '10px' }}>ADICIONAR ITEM</button>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : activeTab === 'books' ? (
+            <div className="responsive-grid">
+              {photobooks.map((pb) => {
+                const cover = pb.photos?.[0]?.image_url;
+                return (
+                  <div key={pb.id} className="book-card" onClick={() => router.push(`/photobook/${pb.id}`)}>
+                    <div className="book-cover">
+                      <div className="book-cover-photo-wrapper">
+                        {cover ? (
+                          <img src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400 })} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                        ) : (
+                          <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: '20px', color: 'var(--border)' }}>photo_library</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="book-info">
+                      <h4 className="book-title">{pb.title}</h4>
+                      <span style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: '600' }}>{pb.photos?.length || 0} FOTOS</span>
                     </div>
                   </div>
-                  <div className="book-info">
-                    <h4 className="book-title">{pb.title}</h4>
-                    <span style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: '600' }}>{pb.photos?.length || 0} FOTOS</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        ) : activeTab === 'moments' ? (
-          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-            {moments.length > 0 ? (
-              moments.map(moment => (
-                <MomentCard key={moment.id} moment={moment} />
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', padding: '60px' }}>
-                <p className="meta">Nenhum momento compartilhado.</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-            {posts.length > 0 ? (
-              posts.map(post => (
-                <PostCard key={post.id} post={post} />
-              ))
-            ) : (
-              <div style={{ textAlign: 'center', padding: '60px' }}>
-                <p className="meta">Nenhum post publicado.</p>
-              </div>
-            )}
-          </div>
-        )}
-      </main>
+                )
+              })}
+            </div>
+          ) : activeTab === 'moments' ? (
+            <div>
+              {moments.length > 0 ? (
+                moments.map(moment => <MomentCard key={moment.id} moment={moment} />)
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px' }}><p className="meta" style={{ fontSize: '11px' }}>Sem momentos.</p></div>
+              )}
+            </div>
+          ) : (
+            <div>
+              {posts.length > 0 ? (
+                posts.map(post => <PostCard key={post.id} post={post} />)
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px' }}><p className="meta" style={{ fontSize: '11px' }}>Sem posts.</p></div>
+              )}
+            </div>
+          )}
+        </main>
+
+        <Sidebar />
+      </div>
     </div>
   )
 }

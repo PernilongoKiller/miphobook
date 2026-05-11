@@ -7,6 +7,9 @@ import Header from '@/components/Header'
 import Skeleton from '@/components/Skeleton'
 import { getOptimizedCloudinaryUrl, DEFAULT_AVATAR } from '@/lib/cloudinary'
 
+import Navigation from '@/components/Navigation'
+import Sidebar from '@/components/Sidebar'
+
 export default function UsersPage() {
   const router = useRouter()
   const supabase = useSupabase()
@@ -39,69 +42,72 @@ export default function UsersPage() {
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
       
-      <main className="main-container" style={{ maxWidth: '800px' }}>
-        <div style={{ marginBottom: '40px', borderBottom: '1px solid var(--border)', paddingBottom: '20px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '-1px' }}>
-            Membros da Comunidade
-          </h2>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '8px' }}>
-            Explore e descubra novas histórias através das pessoas que compõem o miphobook.
-          </p>
-        </div>
+      <div className="app-layout">
+        <Navigation />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-          {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="social-card" style={{ padding: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
-                <Skeleton width="50px" height="50px" style={{ borderRadius: '50%' }} />
-                <div style={{ flexGrow: 1 }}>
-                  <Skeleton width="100px" height="15px" style={{ marginBottom: '8px' }} />
-                  <Skeleton width="150px" height="10px" />
+        <main className="main-feed">
+          <div style={{ marginBottom: '32px', borderBottom: '1px solid var(--border)', paddingBottom: '20px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>
+              Comunidade
+            </h2>
+            <p style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>
+              Explore e descubra novas histórias através das pessoas que compõem o miphobook.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {loading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="social-card" style={{ padding: '16px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                  <Skeleton width="48px" height="48px" style={{ borderRadius: '50%' }} />
+                  <div style={{ flexGrow: 1 }}>
+                    <Skeleton width="100px" height="12px" style={{ marginBottom: '8px' }} />
+                    <Skeleton width="150px" height="10px" />
+                  </div>
                 </div>
+              ))
+            ) : users.map((u) => (
+              <div 
+                key={u.id} 
+                className="social-card" 
+                onClick={() => router.push(`/profile/${u.id}`)}
+                style={{ 
+                  padding: '16px', 
+                  display: 'flex', 
+                  gap: '15px', 
+                  alignItems: 'center', 
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0, backgroundColor: 'var(--border)' }}>
+                  <img 
+                    src={u.avatar_url ? getOptimizedCloudinaryUrl(u.avatar_url, { width: 96, height: 96 }) : DEFAULT_AVATAR} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    loading="lazy"
+                    alt={u.username}
+                  />
+                </div>
+                <div style={{ flexGrow: 1, overflow: 'hidden' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: '700', margin: 0 }}>{u.username}</h3>
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: 'var(--muted)', 
+                    margin: '2px 0 0 0',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {u.bio || 'Sem biografia disponível.'}
+                  </p>
+                </div>
+                <button className="button-primary" style={{ padding: '6px 16px', fontSize: '10px' }}>VER PERFIL</button>
               </div>
-            ))
-          ) : users.map((u) => (
-            <div 
-              key={u.id} 
-              className="social-card" 
-              onClick={() => router.push(`/profile/${u.id}`)}
-              style={{ 
-                padding: '20px', 
-                display: 'flex', 
-                gap: '15px', 
-                alignItems: 'center', 
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease'
-              }}
-            >
-              <div style={{ width: '50px', height: '50px', borderRadius: '50%', overflow: 'hidden', border: '1px solid var(--border)', flexShrink: 0, backgroundColor: 'var(--border)' }}>
-                <img 
-                  src={u.avatar_url ? getOptimizedCloudinaryUrl(u.avatar_url, { width: 100, height: 100 }) : DEFAULT_AVATAR} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  loading="lazy"
-                  alt={u.username}
-                />
-              </div>
-              <div style={{ flexGrow: 1, overflow: 'hidden' }}>
-                <h3 style={{ fontSize: '15px', fontWeight: '700', margin: 0 }}>{u.username}</h3>
-                <p style={{ 
-                  fontSize: '12px', 
-                  color: 'var(--muted)', 
-                  margin: '4px 0 0 0',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {u.bio || 'Sem bio.'}
-                </p>
-              </div>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--border)' }}>
-                chevron_right
-              </span>
-            </div>
-          ))}
-        </div>
-      </main>
+            ))}
+          </div>
+        </main>
+
+        <Sidebar />
+      </div>
     </div>
   )
 }

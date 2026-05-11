@@ -82,55 +82,89 @@ body::after {
   background-color: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   overflow: hidden;
   box-shadow: var(--shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .social-card:hover {
   border-color: var(--muted);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
-[data-theme="dark"] .social-card:hover {
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+[data-theme="dark"] .social-card {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-button {
-  background: transparent;
-  border: 1px solid var(--border);
-  padding: 10px 20px;
-  font-size: 11px;
+/* NOVO LAYOUT 3 COLUNAS */
+.app-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.left-column {
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 100px);
+}
+
+.right-column {
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 100px);
+}
+
+.main-feed {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  margin-bottom: 4px;
+}
+
+.nav-item:hover {
+  background-color: rgba(var(--bg-rgb), 0.05);
+  background-color: var(--border);
+}
+
+.nav-item.active {
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text);
-  cursor: pointer;
-  border-radius: 4px; /* Botões mais retangulares para ar editorial */
-  transition: all 0.2s ease;
 }
 
-button:hover:not(:disabled) {
-  background: var(--border);
-  color: var(--text);
+.nav-item i, .nav-item span {
+  font-size: 24px;
 }
 
-.button-primary {
-  background: var(--text);
-  color: var(--bg);
-  border: 1px solid var(--text);
+/* GRID E CONTAINER CENTRALIZADO */
+.main-container {
+  flex-grow: 1;
+  max-width: 1000px; 
+  margin: 0 auto;
+  width: 100%;
+  padding: 40px 20px; 
 }
 
-.button-primary:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 40px 30px;
 }
-
-/* ... (keep existing book-card styles for the library/explore view) ... */
-
-/* ... (meta remains unchanged) ... */
 
 /* ESTILO BOOK-CARD (LIVRO) - IDENTIDADE MIPHOBOOK */
 .book-card {
@@ -141,8 +175,8 @@ button:hover:not(:disabled) {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  /* Removido overflow: hidden para a linguetinha aparecer fora */
   transition: border-color 0.3s ease;
+  overflow: visible;
 }
 
 /* Marca-página (Bookmark) */
@@ -150,22 +184,22 @@ button:hover:not(:disabled) {
   content: "";
   position: absolute;
   top: 0;
-  right: 25px;
-  width: 12px;
-  height: 35px;
+  right: 20px;
+  width: 10px;
+  height: 30px;
   background-color: var(--text);
-  z-index: -1;
+  z-index: 1;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Estilo de marcador: cantos arredondados apenas embaixo */
   border-radius: 0 0 2px 2px;
 }
 
 .book-card:hover::after {
-  transform: translateY(-20px); /* Desliza para cima */
+  transform: translateY(-15px);
 }
 
 .book-card:hover {
   border-color: var(--text);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 /* Lombada técnica */
@@ -175,7 +209,7 @@ button:hover:not(:disabled) {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 15px; 
+  width: 12px; 
   background: linear-gradient(to right, 
     rgba(0,0,0,0.1) 0%, 
     rgba(0,0,0,0.05) 50%,
@@ -190,17 +224,15 @@ button:hover:not(:disabled) {
   align-items: center;
   justify-content: center;
   background-color: var(--card-bg);
-  padding: 40px 25px 10px 40px; /* Espaço para a lombada */
+  padding: 30px 20px 10px 30px; /* Espaço para a lombada */
   position: relative;
 }
 
-/* Moldura da foto na capa (estilo galeria) */
 .book-cover-photo-wrapper {
   width: 100%;
   height: 100%;
-  max-height: 160px;
   border: 1px solid var(--border);
-  padding: 8px;
+  padding: 5px;
   background: white;
   display: flex;
   align-items: center;
@@ -221,7 +253,7 @@ button:hover:not(:disabled) {
 }
 
 .book-info {
-  padding: 20px 20px 30px 40px; /* Recuo para a lombada */
+  padding: 10px 15px 20px 30px;
   background: var(--card-bg);
   z-index: 5;
   text-align: center;
@@ -229,66 +261,40 @@ button:hover:not(:disabled) {
 
 .book-title {
   font-family: 'Inter', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin: 0 0 6px 0;
+  margin: 0 0 4px 0;
   line-height: 1.4;
   color: var(--text);
 }
 
-/* GRID E CONTAINER CENTRALIZADO */
-.main-container {
-  flex-grow: 1;
-  max-width: 1000px; /* Reduzido para centralizar mais o conteúdo */
-  margin: 0 auto;
-  width: 100%;
-  padding: 60px 60px; /* Aumentado o recuo lateral de 20px para 60px */
-}
-
-.responsive-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 60px 40px; /* Mais espaço entre os livros na estante */
-}
-
-.card-large {
-  grid-column: span 2;
-  grid-row: span 2;
-}
-
-.hide-on-mobile {
-  display: flex;
-}
-
-.mobile-bottom-nav {
-  display: none;
+@media (max-width: 1100px) {
+  .app-layout {
+    grid-template-columns: 80px 1fr;
+    max-width: 800px;
+  }
+  .right-column {
+    display: none;
+  }
+  .nav-text {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
-  .responsive-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 15px !important;
+  .app-layout {
+    display: block;
+    padding: 0;
   }
-  
-  .card-large {
-    grid-column: span 2 !important;
-    grid-row: auto !important;
+  .left-column {
+    display: none;
   }
-  
-  .main-container {
-    padding: 15px 0 !important; /* Conteúdo encosta nas laterais no mobile */
-    padding-bottom: 90px !important;
+  .main-feed {
+    padding: 10px 0;
   }
 
-  .main-container > div {
-    padding: 0 10px; /* Mas mantemos um respiro interno para os elementos que não são cards */
-  }
-
-  .hide-on-mobile {
-    display: none !important;
-  }
 
   .mobile-bottom-nav {
     display: flex !important;

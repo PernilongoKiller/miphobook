@@ -11,6 +11,7 @@ import MomentCard from '@/components/MomentCard'
 import PostCard from '@/components/PostCard'
 import PostComposer from '@/components/PostComposer'
 import MemoryPrompt from '@/components/MemoryPrompt'
+import Navigation from '@/components/Navigation'
 import { getOptimizedCloudinaryUrl } from '@/lib/cloudinary'
 
 export default function Home() {
@@ -19,7 +20,7 @@ export default function Home() {
   const { user } = useUser()
   const { toast } = useToast()
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'explore' | 'feed' | 'following'>('explore')
+  const [activeTab, setActiveTab] = useState<'explore' | 'feed' | 'following'>('feed')
   const [photobooks, setPhotobooks] = useState<any[]>([])
   const [feedItems, setFeedItems] = useState<any[]>([])
   const [composerPrefill, setComposerPrefill] = useState('')
@@ -31,7 +32,6 @@ export default function Home() {
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     
     try {
-      // Buscar posts e fotos em paralelo das últimas 24 horas
       const [postsRes, photosRes] = await Promise.all([
         supabase
           .from('posts')
@@ -67,8 +67,6 @@ export default function Home() {
         
         if (!likesError) {
           postLikes = likesData || []
-        } else {
-          console.warn("Erro ao buscar post_likes, talvez a tabela não exista:", likesError)
         }
       }
 
@@ -172,8 +170,6 @@ export default function Home() {
         
         if (!likesError) {
           postLikes = likesData || []
-        } else {
-          console.warn("Erro ao buscar post_likes no feed seguindo:", likesError)
         }
       }
 
@@ -239,77 +235,86 @@ export default function Home() {
     else if (activeTab === 'following' && user) fetchFollowedMoments(user.id)
   }, [activeTab, fetchPhotobooks, fetchGlobalFeed, fetchFollowedMoments, user])
 
+  // Lógica para mudar aba via hash (vindo da navegação)
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash === '#explore') setActiveTab('explore');
+      else if (hash === '#feed') setActiveTab('feed');
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main className="main-container" style={{ display: 'flex', justifyContent: 'center' }}>
-        
-        <div style={{ flexGrow: 1, maxWidth: activeTab !== 'explore' ? '600px' : '1000px' }}>
+      <div className="app-layout">
+        <Navigation />
+
+        <main className="main-feed">
           
-          <div style={{ display: 'flex', gap: '25px', marginBottom: '30px', borderBottom: '1px solid var(--border)', padding: '0 15px', justifyContent: 'center' }}>
-            <span 
-              onClick={() => setActiveTab('explore')} 
-              style={{ 
-                padding: '12px 0', fontSize: '11px', fontWeight: activeTab === 'explore' ? '700' : '400',
-                cursor: 'pointer', color: activeTab === 'explore' ? 'var(--text)' : 'var(--muted)',
-                borderBottom: activeTab === 'explore' ? '2px solid var(--text)' : 'none',
-                textTransform: 'uppercase', letterSpacing: '1px'
-              }}
-            >Biblioteca</span>
-            
+          <div style={{ display: 'flex', gap: '25px', marginBottom: '20px', borderBottom: '1px solid var(--border)', padding: '0 5px' }}>
             <span 
               onClick={() => setActiveTab('feed')} 
               style={{ 
-                padding: '12px 0', fontSize: '11px', fontWeight: activeTab === 'feed' ? '700' : '400',
+                padding: '12px 0', fontSize: '12px', fontWeight: activeTab === 'feed' ? '700' : '500',
                 cursor: 'pointer', color: activeTab === 'feed' ? 'var(--text)' : 'var(--muted)',
                 borderBottom: activeTab === 'feed' ? '2px solid var(--text)' : 'none',
-                textTransform: 'uppercase', letterSpacing: '1px'
               }}
-            >Feed</span>
+            >Para você</span>
 
             {user && (
               <span 
                 onClick={() => setActiveTab('following')} 
                 style={{ 
-                  padding: '12px 0', fontSize: '11px', fontWeight: activeTab === 'following' ? '700' : '400',
+                  padding: '12px 0', fontSize: '12px', fontWeight: activeTab === 'following' ? '700' : '500',
                   cursor: 'pointer', color: activeTab === 'following' ? 'var(--text)' : 'var(--muted)',
                   borderBottom: activeTab === 'following' ? '2px solid var(--text)' : 'none',
-                  textTransform: 'uppercase', letterSpacing: '1px'
                 }}
               >Seguindo</span>
             )}
+
+            <span 
+              onClick={() => setActiveTab('explore')} 
+              style={{ 
+                padding: '12px 0', fontSize: '12px', fontWeight: activeTab === 'explore' ? '700' : '500',
+                cursor: 'pointer', color: activeTab === 'explore' ? 'var(--text)' : 'var(--muted)',
+                borderBottom: activeTab === 'explore' ? '2px solid var(--text)' : 'none',
+              }}
+            >Biblioteca</span>
           </div>
 
-          {activeTab === 'feed' && user && (
-            <>
+          {activeTab !== 'explore' && user && (
+            <div style={{ marginBottom: '24px' }}>
+              <PostComposer onPostCreated={fetchGlobalFeed} prefilledContent={composerPrefill} />
               <MemoryPrompt onSelectPrompt={(prompt) => {
                 setComposerPrefill(`**${prompt}**\n`);
-                // Scroll suave para o compositor (opcional)
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }} />
-              <PostComposer onPostCreated={fetchGlobalFeed} prefilledContent={composerPrefill} />
-            </>
+            </div>
           )}
 
           {loading ? (
-            <div className={activeTab === 'explore' ? "responsive-grid" : ""}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ marginBottom: '40px', height: activeTab === 'explore' ? '300px' : '500px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} style={{ height: '300px' }}>
                   <Skeleton height="100%" width="100%" />
                 </div>
               ))}
             </div>
           ) : activeTab === 'explore' ? (
-            <div className="responsive-grid">
+            <div className="responsive-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '20px' }}>
               {photobooks.map((pb) => {
                 const photos = pb.photos || [];
                 const cover = photos.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())?.[0]?.image_url;
                 
                 return (
                   <div key={pb.id} className="book-card" onClick={() => router.push(`/photobook/${pb.id}`)}>
-                    <div className="book-cover">
-                      <div className="book-cover-photo-wrapper">
+                    <div className="book-cover" style={{ padding: '20px 10px 10px 25px' }}>
+                      <div className="book-cover-photo-wrapper" style={{ maxHeight: '120px' }}>
                         {cover ? (
                           <img 
                             src={getOptimizedCloudinaryUrl(cover, { width: 300, height: 400 })} 
@@ -324,11 +329,9 @@ export default function Home() {
                         )}
                       </div>
                     </div>
-                    <div className="book-info">
-                      <h4 className="book-title">{pb.title}</h4>
-                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--muted)', fontWeight: '600' }}>{pb.users?.username}</span>
-                      </div>
+                    <div className="book-info" style={{ padding: '10px 10px 20px 25px' }}>
+                      <h4 className="book-title" style={{ fontSize: '11px' }}>{pb.title}</h4>
+                      <span style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: '600' }}>{pb.users?.username}</span>
                     </div>
                   </div>
                 )
@@ -337,7 +340,7 @@ export default function Home() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {feedItems.length > 0 ? (
-                feedItems.map((item, index) => (
+                feedItems.map((item) => (
                   item.type === 'post' ? (
                     <PostCard key={item.id} post={item} />
                   ) : (
@@ -347,12 +350,16 @@ export default function Home() {
               ) : (
                 <div style={{ textAlign: 'center', padding: '100px 20px' }}>
                   <p className="meta">Nada para ver aqui por enquanto.</p>
+                  {!user && <button onClick={() => router.push('/login')} className="button-primary" style={{ marginTop: '20px' }}>CRIAR CONTA</button>}
                 </div>
               )}
             </div>
           )}
-        </div>
-      </main>
+        </main>
+
+        <Sidebar />
+
+      </div>
     </div>
   )
 }
