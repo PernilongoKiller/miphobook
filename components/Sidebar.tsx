@@ -54,7 +54,7 @@ export default function Sidebar() {
           {loading ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <Skeleton width="40px" height="40px" circle />
+                <Skeleton width="40px" height="40px" borderRadius="50%" />
                 <div style={{ flexGrow: 1 }}>
                   <Skeleton width="100px" height="12px" />
                 </div>
