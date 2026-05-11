@@ -357,8 +357,6 @@ export default function Home() {
           )}
         </main>
 
-        <Sidebar />
-
       </div>
     </div>
   )

@@ -96,19 +96,15 @@ body::after {
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 
-/* NOVO LAYOUT 3 COLUNAS */
+/* NOVO LAYOUT 2 COLUNAS */
 .app-layout {
   display: grid;
-  grid-template-columns: 240px 1fr 320px;
+  grid-template-columns: 240px 1fr;
   gap: 32px;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
-}
-
-.mobile-bottom-nav {
-  display: none; /* Escondido por padrão no desktop */
 }
 
 .left-column {
@@ -117,14 +113,8 @@ body::after {
   height: calc(100vh - 100px);
 }
 
-.right-column {
-  position: sticky;
-  top: 80px;
-  height: calc(100vh - 100px);
-}
-
 .main-feed {
-  max-width: 600px;
+  max-width: 650px; /* Levemente aumentado para aproveitar o espaço */
   width: 100%;
   margin: 0 auto;
 }
@@ -287,13 +277,14 @@ body::after {
   color: var(--text);
 }
 
+.mobile-bottom-nav {
+  display: none; 
+}
+
 @media (max-width: 1100px) {
   .app-layout {
     grid-template-columns: 80px 1fr;
-    max-width: 900px;
-  }
-  .right-column {
-    display: none;
+    max-width: 800px;
   }
   .nav-text {
     display: none;

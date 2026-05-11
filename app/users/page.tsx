@@ -105,8 +105,6 @@ export default function UsersPage() {
             ))}
           </div>
         </main>
-
-        <Sidebar />
       </div>
     </div>
   )

@@ -386,8 +386,6 @@ export default function UserProfilePage() {
             </div>
           )}
         </main>
-
-        <Sidebar />
       </div>
     </div>
   )
