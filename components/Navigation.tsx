@@ -13,7 +13,6 @@ export default function Navigation() {
     { label: 'Início', icon: 'home', href: '/' },
     { label: 'Explorar', icon: 'explore', href: '/#explore' }, // Usando hash para controle interno ou rota se preferir
     { label: 'Comunidade', icon: 'group', href: '/users' },
-    { label: 'Notificações', icon: 'notifications', href: '/notifications', badge: false }, // Badge logic can be added
     { label: 'Criar Álbum', icon: 'add_box', href: '/create-photobook' },
     { label: 'Perfil', icon: 'person', href: user ? `/profile/${user.id}` : '/login' },
     { label: 'Configurações', icon: 'settings', href: '/settings' },

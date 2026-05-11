@@ -291,21 +291,32 @@ export default function UserProfilePage() {
           </div>
 
           {/* ABAS */}
-          <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--border)', marginBottom: '24px', overflowX: 'auto', paddingBottom: '1px' }}>
-            {['mural', 'books', 'moments', 'posts'].map((tab) => (
+          <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid var(--border)', marginBottom: '24px', overflowX: 'auto', paddingBottom: '1px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '20px', flexGrow: 1 }}>
+              {['mural', 'books', 'moments', 'posts'].map((tab) => (
+                <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab as any)}
+                  style={{ 
+                    border: 'none', padding: '12px 0', backgroundColor: 'transparent', 
+                    color: activeTab === tab ? 'var(--text)' : 'var(--muted)',
+                    borderBottom: activeTab === tab ? '2px solid var(--text)' : 'none',
+                    borderRadius: 0, fontSize: '10px', fontWeight: '800', whiteSpace: 'nowrap'
+                  }}
+                >
+                  {tab.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {isOwner && activeTab === 'mural' && (
               <button 
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
-                style={{ 
-                  border: 'none', padding: '12px 0', backgroundColor: 'transparent', 
-                  color: activeTab === tab ? 'var(--text)' : 'var(--muted)',
-                  borderBottom: activeTab === tab ? '2px solid var(--text)' : 'none',
-                  borderRadius: 0, fontSize: '10px', fontWeight: '800', whiteSpace: 'nowrap'
-                }}
+                onClick={() => setIsAddingToMural(true)}
+                style={{ fontSize: '10px', height: '28px', padding: '0 12px' }}
               >
-                {tab.toUpperCase()}
+                PRENDER NO MURAL
               </button>
-            ))}
+            )}
           </div>
 
           {/* CONTEÚDO DAS ABAS */}
