@@ -168,10 +168,21 @@ export default function Header() {
           {loading ? <Skeleton width="40px" height="20px" /> : userId ? (
             <>
               <div ref={notifRef} style={{ position: 'relative' }}>
-                <button onClick={() => { setShowNotifications(!showNotifications); markAsRead(); }} style={iconButtonStyle}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>notifications</span>
-                  {unreadCount > 0 && <span style={{ position: 'absolute', top: '6px', right: '6px', width: '8px', height: '8px', backgroundColor: '#ed4956', borderRadius: '50%', border: '2px solid var(--bg)' }}></span>}
-                </button>
+                <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                  {/* Botão Comunidade - Apenas Mobile */}
+                  <button 
+                    onClick={() => router.push('/users')} 
+                    className="hide-on-desktop" 
+                    style={iconButtonStyle}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>group</span>
+                  </button>
+
+                  <button onClick={() => { setShowNotifications(!showNotifications); markAsRead(); }} style={iconButtonStyle}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>notifications</span>
+                    {unreadCount > 0 && <span style={{ position: 'absolute', top: '6px', right: '6px', width: '8px', height: '8px', backgroundColor: '#ed4956', borderRadius: '50%', border: '2px solid var(--bg)' }}></span>}
+                  </button>
+                </div>
                 {showNotifications && (
                   <div style={{ 
                     position: 'absolute', 

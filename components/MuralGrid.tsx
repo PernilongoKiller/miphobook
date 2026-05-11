@@ -110,95 +110,89 @@ export default function MuralGrid({ items, isOwner, onItemDeleted }: MuralGridPr
 
         .mural-item {
           break-inside: avoid;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
           position: relative;
           background: var(--card-bg);
           border: 1px solid var(--border);
           box-shadow: var(--shadow);
-          transition: transform 0.2s ease;
+          transition: all 0.3s ease;
+          border-radius: var(--radius);
+          overflow: hidden;
         }
 
         .mural-item:hover {
-          transform: translateY(-2px);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.04);
+          border-color: var(--muted);
         }
 
         .mural-delete-btn {
           position: absolute;
-          top: -10px;
-          right: -10px;
-          width: 24px;
-          height: 24px;
+          top: 12px;
+          right: 12px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
-          background: var(--text);
-          color: var(--bg);
-          border: none;
+          background: rgba(var(--bg-rgb), 0.8);
+          backdrop-filter: blur(10px);
+          color: var(--text);
+          border: 1px solid var(--border);
           display: flex;
           align-items: center;
           justify-content: center;
           cursor: pointer;
           z-index: 10;
           opacity: 0;
-          transition: opacity 0.2s ease;
+          transition: all 0.2s ease;
         }
 
         .mural-item:hover .mural-delete-btn {
           opacity: 1;
         }
 
-        /* Estilo Texto (Diário/Post-it) */
+        /* Estilo Texto (Editorial) */
         .mural-item-text {
-          padding: 24px;
+          padding: 32px;
           background-color: var(--card-bg);
-          border: 1px solid var(--border);
           color: var(--text);
-          transform: rotate(-0.5deg);
         }
         
-        [data-theme="dark"] .mural-item-text {
-          background-color: var(--card-bg);
-          color: var(--text);
-          border-color: var(--border);
-        }
-
         .mural-content-text {
           color: var(--text) !important;
+          font-size: 14px;
+          line-height: 1.6;
         }
 
         .mural-title {
           font-family: 'Alfa Slab One', serif;
-          font-size: 14px;
-          margin: 0 0 10px 0;
+          font-size: 12px;
+          margin: 0 0 16px 0;
           text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--muted);
         }
 
         .mural-item-photo {
-          padding: 10px 10px 30px 10px;
-          background: white;
-          transform: rotate(1deg);
-        }
-
-        [data-theme="dark"] .mural-item-photo {
-          background: #1a1a1a;
-          border-color: #333;
+          padding: 0;
+          background: var(--card-bg);
         }
 
         .mural-photo-img {
           width: 100%;
           display: block;
-          border: 1px solid rgba(0,0,0,0.05);
         }
 
         .mural-photo-caption {
-          margin: 15px 0 0 0;
-          font-family: 'Georgia', serif;
-          font-style: italic;
-          font-size: 13px;
-          text-align: center;
-          color: #555;
-        }
-        
-        [data-theme="dark"] .mural-photo-caption {
-          color: #aaa;
+          padding: 16px 20px;
+          margin: 0;
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          font-size: 11px;
+          text-align: left;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: var(--muted);
+          border-top: 1px solid var(--border);
         }
 
         .mural-content-link {

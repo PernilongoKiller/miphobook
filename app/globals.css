@@ -143,46 +143,31 @@ body::before, body::after {
   flex-direction: column;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.05);
 }
 
-/* Marca-página (Bookmark) */
-.book-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 15px;
-  width: 8px;
-  height: 25px;
-  background-color: var(--text);
-  z-index: 1;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 0 0 1px 1px;
-}
-
-.book-card:hover::after {
-  transform: translateY(-12px);
-}
+/* Marca-página removido para visual mais limpo */
 
 .book-card:hover {
   border-color: var(--text);
-  transform: translateY(-5px);
-  box-shadow: 10px 10px 30px rgba(0,0,0,0.1);
+  transform: translateY(-5px) rotate(1deg); /* Pequena rotação no hover para ar mais orgânico */
+  box-shadow: 15px 15px 40px rgba(0,0,0,0.08);
 }
 
-/* Lombada técnica */
+/* Lombada técnica mais profunda */
 .book-card::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
-  width: 15px; 
+  width: 18px; 
   background: linear-gradient(to right, 
-    rgba(0,0,0,0.12) 0%, 
-    rgba(0,0,0,0.06) 50%,
+    rgba(0,0,0,0.15) 0%, 
+    rgba(0,0,0,0.08) 40%,
+    rgba(0,0,0,0.02) 80%,
     transparent 100%);
-  border-right: 1px solid rgba(0,0,0,0.08);
+  border-right: 1px solid rgba(0,0,0,0.1);
   z-index: 10;
 }
 

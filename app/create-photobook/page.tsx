@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/lib/SupabaseProvider'
 import { useToast } from '@/lib/ToastProvider'
 import Header from '@/components/Header'
+import Navigation from '@/components/Navigation'
 
 export default function CreatePhotobookPage() {
   const router = useRouter()
@@ -73,55 +74,54 @@ export default function CreatePhotobookPage() {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      minHeight: '100vh',
-      backgroundColor: 'var(--bg)',
-      color: 'var(--text)',
-    }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
       <Header />
 
-      <main className="main-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="card-border" style={{
-          padding: '30px',
-          width: '100%',
-          maxWidth: '400px',
-          backgroundColor: 'var(--bg)',
-        }}>
-          <h2 style={{ marginBottom: '20px', fontSize: '14px', fontWeight: '900', textTransform: 'uppercase' }}>Novo Photobook</h2>
-          
-          <form onSubmit={handleCreatePhotobook} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <input
-              type="text"
-              placeholder="Título"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none' }}
-            />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <textarea
-                placeholder="Descrição (opcional)"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-                style={{ padding: '10px', border: '1px solid var(--border)', fontSize: '13px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', resize: 'none' }}
+      <div className="app-layout">
+        <Navigation />
+
+        <main className="main-feed" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <div className="social-card" style={{
+            padding: '40px',
+            width: '100%',
+            maxWidth: '500px',
+            backgroundColor: 'var(--card-bg)',
+          }}>
+            <h2 style={{ marginBottom: '32px', fontSize: '12px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '1px' }}>Novo Photobook</h2>
+            
+            <form onSubmit={handleCreatePhotobook} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <input
+                type="text"
+                placeholder="Título da sua história..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                style={{ padding: '12px 0', border: 'none', borderBottom: '1px solid var(--border)', fontSize: '14px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none' }}
               />
-              <p style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'left', margin: 0 }}>
-                Dica: **negrito**, *itálico*. Quebras de linha funcionam.
-              </p>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{ height: '40px', fontSize: '11px' }}
-            >
-              {loading ? 'Criando...' : 'Criar Photobook'}
-            </button>
-          </form>
-        </div>
-      </main>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <textarea
+                  placeholder="Sobre o que é este álbum?"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={4}
+                  style={{ padding: '12px 0', border: 'none', borderBottom: '1px solid var(--border)', fontSize: '14px', backgroundColor: 'transparent', color: 'var(--text)', outline: 'none', resize: 'none' }}
+                />
+                <p style={{ fontSize: '10px', color: 'var(--muted)', textAlign: 'left', margin: 0, opacity: 0.7 }}>
+                  Dica: Você pode usar **negrito** e *itálico*.
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="button-primary"
+                style={{ height: '44px', fontSize: '11px', marginTop: '20px' }}
+              >
+                {loading ? 'PUBLICANDO...' : 'CRIAR PHOTOBOOK'}
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
