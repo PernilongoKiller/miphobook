@@ -105,24 +105,25 @@ export default function Header() {
             color: 'var(--text)'
           }}>miphobook</h1>
           
-          <div className="hide-on-mobile" ref={searchRef} style={{ position: 'relative', width: '300px' }}>
+          <div className="hide-on-mobile" ref={searchRef} style={{ position: 'relative', width: '320px' }}>
             <input 
               type="text" 
-              placeholder="Pesquisar memórias ou pessoas..." 
+              placeholder="Pesquisar..." 
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
               style={{ 
                 width: '100%', 
-                padding: '10px 16px 10px 40px',
-                backgroundColor: 'rgba(var(--bg-rgb), 0.05)', 
+                padding: '8px 12px 8px 36px',
+                backgroundColor: 'transparent', 
                 border: '1px solid var(--border)', 
-                borderRadius: '20px',
+                borderRadius: '6px',
                 color: 'var(--text)', 
                 fontSize: '13px', 
-                outline: 'none' 
+                outline: 'none',
+                transition: 'border-color 0.2s ease'
               }} 
             />
-            <span className="material-symbols-outlined" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px', opacity: 0.5 }}>search</span>
+            <span className="material-symbols-outlined" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px', opacity: 0.3 }}>search</span>
             {showResults && (
               <div style={{ 
                 position: 'absolute', 
