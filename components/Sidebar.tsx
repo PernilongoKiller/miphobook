@@ -97,8 +97,8 @@ export default function Sidebar() {
       </div>
 
       <div style={{ padding: '0 20px', fontSize: '11px', color: 'var(--muted)', lineHeight: '1.6' }}>
-        <p>© 2026 MIPHOBOOK DA CUBIECLOUD</p>
-        <p style={{ marginTop: '8px' }}>Nem toda foto é só uma imagem. Guarde suas memórias com carinho.</p>
+        <p>© 2026 MIPHOBOOK</p>
+        <p style={{ marginTop: '8px' }}>Nem toda foto é só uma imagem.</p>
       </div>
     </aside>
   )
